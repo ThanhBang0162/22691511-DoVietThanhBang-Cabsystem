@@ -56,11 +56,7 @@ Những hạn chế này làm giảm hiệu quả vận hành, ảnh hưởng đ
 4. Hệ thống hiện tại khó mở rộng: Khó đáp ứng tải tăng, khó triển khai chức năng mới từng phần và cần hạn chế lỗi ở một chức năng ảnh hưởng toàn hệ thống.
 
 # BƯỚC 2: XÁC ĐỊNH STAKEHOLDER
-
-Dựa trên nội dung **Customer-Requirement.docx**, các stakeholder của dự án **CAB System** có thể xác định như sau:
-
-| **Stakeholder**                                            | **Vai trò**                                                                                                                                                                                              |
-| ---------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Stakeholder**                                            | **Vai trò**                                                                                                                                                                  
 | **Ban giám đốc / Ban lãnh đạo Công ty ABC**                | Đưa ra định hướng, mục tiêu và yêu cầu tổng thể của dự án; mong muốn hệ thống có khả năng mở rộng lâu dài; theo dõi các báo cáo về số chuyến, doanh thu, tỷ lệ hoàn thành, tỷ lệ hủy và hiệu quả tài xế. |
 | **Khách hàng (Customer)**                                  | Người trực tiếp sử dụng hệ thống để đăng ký/đăng nhập, nhập điểm đón – điểm đến, chọn loại xe, đặt xe, theo dõi chuyến đi, xem lịch sử, thanh toán và đánh giá tài xế.                                   |
 | **Tài xế (Driver)**                                        | Người cung cấp dịch vụ vận chuyển; quản lý hồ sơ và phương tiện, cập nhật trạng thái sẵn sàng, nhận/từ chối chuyến và cập nhật trạng thái trong quá trình thực hiện chuyến.                              |
@@ -69,28 +65,11 @@ Dựa trên nội dung **Customer-Requirement.docx**, các stakeholder của d�
 | **Nhà cung cấp thanh toán bên ngoài (Payment Provider)**   | Cung cấp dịch vụ thanh toán điện tử được tích hợp với CAB System; xử lý giao dịch thanh toán mà không yêu cầu CAB lưu trực tiếp thông tin thẻ/tài khoản nhạy cảm.                                        |
 | **Nhà cung cấp dịch vụ thông báo (Notification Provider)** | Hỗ trợ gửi thông báo cho khách hàng và tài xế. Hệ thống được yêu cầu có khả năng bổ sung thêm các kênh/nhà cung cấp thông báo trong tương lai.                                                           |
 | **Nhóm phát triển (Development Team)**                     | Xây dựng và triển khai CAB System dựa trên các yêu cầu đã được BA làm rõ.                                                                                                                                |
-
 Trong đó, tài liệu xác định rõ **3 nhóm người dùng chính** của hệ thống là **Khách hàng, Tài xế và Nhân viên vận hành**.  Nhân viên vận hành còn chịu trách nhiệm quản lý và giám sát hoạt động, trong khi ban lãnh đạo cần các báo cáo phục vụ quản lý. 
 
-**Lưu ý:** “Nhà cung cấp dịch vụ thông báo” và “Nhóm phát triển” được suy ra từ yêu cầu tích hợp/mở rộng và bối cảnh phát triển trong tài liệu; tài liệu không định danh một tổ chức cụ thể cho hai stakeholder này. 
-
-### Bảng ngắn gọn để đưa vào bài
-
-| **Stakeholder**             | **Vai trò**                                               |
-| --------------------------- | --------------------------------------------------------- |
-| Ban giám đốc / Ban lãnh đạo | Định hướng, đưa ra yêu cầu và theo dõi hiệu quả hoạt động |
-| Khách hàng                  | Đặt xe, theo dõi chuyến, thanh toán, đánh giá             |
-| Tài xế                      | Nhận chuyến và thực hiện chuyến đi                        |
-| Nhân viên vận hành          | Quản lý và giám sát hoạt động hệ thống                    |
-| Business Analyst            | Phân tích và làm rõ yêu cầu nghiệp vụ                     |
-| Payment Provider            | Xử lý thanh toán điện tử                                  |
-| Notification Provider       | Cung cấp kênh/dịch vụ gửi thông báo                       |
-| Development Team            | Phát triển và triển khai hệ thống CAB                     |
- STAKEHOLDER MATRIX – MA TRẬN MỨC ĐỘ ẢNH HƯỞNG
-
-Dựa trên các stakeholder đã xác định từ **CAB System**, có thể xây dựng **Stakeholder Matrix theo 2 tiêu chí:**
-* **Power (Mức độ ảnh hưởng/quyền lực):** Khả năng tác động đến quyết định, yêu cầu và sự thành công của dự án.
-* **Interest (Mức độ quan tâm):** Mức độ stakeholder quan tâm hoặc bị ảnh hưởng bởi CAB System.
+Dựa trên các stakeholder đã xác định từ **CAB System**, có thể xây dựng **Stakeholder Matrix theo 2 tiêu chí:Power (Mức độ ảnh hưởng/quyền lực):
+Khả năng tác động đến quyết định, yêu cầu và sự thành công của dự án.
+Interest (Mức độ quan tâm):** Mức độ stakeholder quan tâm hoặc bị ảnh hưởng bởi CAB System.
 
 Tài liệu cho thấy ban lãnh đạo đưa ra các kỳ vọng cấp cao; khách hàng, tài xế và nhân viên vận hành là các nhóm sử dụng/nghiệp vụ chính.  
 ## 1. Ma trận Power – Interest
@@ -133,4 +112,21 @@ MỨC ĐỘ           │                     │ ★ Nhân viên vận hành   
 **Manage Closely – Quản lý chặt chẽ:** Ban lãnh đạo, BA và nhân viên vận hành cần được tham gia thường xuyên vào quá trình phân tích yêu cầu, xác nhận nghiệp vụ và các quyết định quan trọng.
 **Keep Satisfied – Duy trì sự hài lòng:** Payment Provider cần được quản lý tốt về yêu cầu tích hợp, bảo mật và xử lý giao dịch.
 **Keep Informed – Cập nhật thông tin:** Khách hàng, tài xế và Development Team cần được cung cấp đầy đủ thông tin liên quan đến yêu cầu, thay đổi và hoạt động của hệ thống.
-**Monitor – Theo dõi:** Notification Provider cần được theo dõi nhưng mức độ tham gia vào quyết định nghiệp vụ cốt lõi thấp hơn. CAB System cũng được yêu cầu có khả năng mở rộng thêm các kênh thông báo mà không phải thay đổi toàn bộ hệ thống. 
+**Monitor – Theo dõi:** Notification Provider cần được theo dõi nhưng mức độ tham gia vào quyết định nghiệp vụ cốt lõi thấp hơn. CAB System cũng được yêu cầu có khả năng mở rộng thêm các kênh thông báo mà không phải thay đổi toàn bộ hệ thống.
+
+# BƯỚC 3: XÁC ĐỊNH BUSINESS GOAL THEO YÊU CẦU KHÁCH HÀNG
+
+| Mã       | Business Goal                                             | Phân tích mục tiêu                                                                                                                                                                                                              
+| **BG01** | **Hỗ trợ thanh toán trực tuyến**                          | Cho phép khách hàng thanh toán điện tử sau khi hoàn thành chuyến đi, bên   cạnh thanh toán tiền mặt. Hệ thống cần tích hợp với nhà cung cấp thanh toán bên ngoài và không lưu trực tiếp thông tin nhạy cảm của thẻ/tài khoản thanh toán. Khi giao dịch thất bại, hệ thống phải thông báo và hỗ trợ xử lý lại theo chính sách doanh nghiệp.  |
+| **BG02** | **Giảm thời gian tìm và phân công tài xế**                | Tự động tìm tài xế phù hợp dựa trên vị trí, trạng thái sẵn sàng và các tiêu chí vận hành. Ưu tiên tài xế phù hợp và gần khách hàng. Nếu tài xế đầu tiên từ chối hoặc không phản hồi, hệ thống tiếp tục tìm tài xế khác mà khách hàng không phải tạo lại yêu cầu.                                                                          |
+| **BG03** | **Nâng cao khả năng theo dõi chuyến đi của khách hàng**   | Cho phép khách hàng biết trạng thái của yêu cầu đặt xe, tài xế nào đã nhận chuyến, thời gian dự kiến tài xế đến và trạng thái hiện tại của chuyến đi. Điều này giúp tăng tính minh bạch và cải thiện trải nghiệm khách hàng.                                                                                                              |
+| **BG04** | **Tự động hóa và chuẩn hóa quy trình chuyến đi**          | Hỗ trợ toàn bộ quy trình từ khi khách hàng tạo yêu cầu, tìm tài xế, thực hiện chuyến, hoàn thành chuyến, tính cước, thanh toán cho đến đánh giá sau chuyến.                                                                                                                                                                               |
+| **BG05** | **Quản lý tập trung thông tin vận hành**                  | Quản lý tập trung khách hàng, tài xế, phương tiện, chuyến đi và lịch sử giao dịch, giúp nhân viên vận hành dễ dàng theo dõi và xử lý các trường hợp phát sinh.                                                                                                                                                                            |
+| **BG06** | **Cải thiện khả năng quản lý tài xế**                     | Cho phép quản lý hồ sơ tài xế, phương tiện, trạng thái hoạt động và vị trí tài xế. Dữ liệu vị trí giúp hệ thống tìm tài xế gần khách hàng và hỗ trợ dự kiến thời gian đến.                                                                                                                                                                |
+| **BG07** | **Cải thiện việc thông báo cho khách hàng và tài xế**     | Tự động gửi thông báo khi yêu cầu đặt xe được tiếp nhận, khi có tài xế nhận chuyến, khi tài xế đến điểm đón, khi chuyến hoàn thành và khi thanh toán có kết quả; đồng thời thông báo cho tài xế về chuyến mới hoặc thay đổi liên quan.                                                                                                    |
+| **BG08** | **Nâng cao hiệu quả quản lý và giám sát hoạt động**       | Cung cấp giao diện quản trị để nhân viên vận hành theo dõi chuyến đang diễn ra, kiểm tra trạng thái tài xế, xử lý chuyến lỗi và tra cứu lịch sử giao dịch.                                                                                                                                                                                |
+| **BG09** | **Hỗ trợ ra quyết định bằng báo cáo và thống kê**         | Cung cấp báo cáo về số lượng chuyến, doanh thu, tỷ lệ chuyến hoàn thành, tỷ lệ hủy và hiệu quả hoạt động của tài xế để ban lãnh đạo theo dõi tình hình kinh doanh.                                                                                                                                                                        |
+| **BG10** | **Tăng khả năng mở rộng của hệ thống**                    | Hệ thống cần phục vụ được số lượng lớn khách hàng và tài xế, đồng thời các thành phần có thể mở rộng độc lập khi tải tăng.                                                                                                                                                                                                                |
+| **BG11** | **Tăng độ ổn định và khả năng chịu lỗi**                  | Lỗi ở chức năng thanh toán hoặc thông báo không được làm toàn bộ hệ thống đặt xe ngừng hoạt động, giúp giảm ảnh hưởng của sự cố đến hoạt động kinh doanh.                                                                                                                                                                                 |
+| **BG12** | **Đảm bảo an toàn và bảo mật dữ liệu**                    | Xác thực khách hàng và tài xế, phân quyền các chức năng quản trị, bảo vệ thông tin cá nhân, phương tiện, vị trí và giao dịch; đồng thời lưu vết các thao tác quan trọng để phục vụ kiểm tra sự cố.                                                                                                                                        |
+| **BG13** | **Tạo nền tảng linh hoạt cho phát triển trong tương lai** | Cho phép bổ sung loại dịch vụ mới, phương thức thanh toán mới, nhà cung cấp thông báo mới hoặc thay đổi một số thành phần kỹ thuật mà không phải xây dựng lại toàn bộ hệ thống.                                                                                                                                                        
