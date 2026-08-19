@@ -2139,3 +2139,988 @@ Tài liệu không xác định chính xác **những thao tác nào phải log*
 | **TBD-NFR10** | KPI cụ thể cho Driver Matching         | Chưa xác định |
 
 Đặc biệt tài liệu xác nhận rằng **xử lý mất kết nối và thời gian lưu dữ liệu vẫn chưa được chốt**. 
+
+# BƯỚC 11: THIẾT KẾ USE CASE CHO CAB SYSTEM
+
+Dựa trên toàn bộ yêu cầu trong **Customer-Requirement.docx**, có thể thiết kế Use Case Diagram cho CAB System với các actor chính: **Khách hàng, Tài xế, Nhân viên vận hành** và actor ngoài hệ thống là **Payment Provider**. Tài liệu xác định rõ ba nhóm người dùng chính này. 
+
+## 1. Xác định Actor
+
+| Actor                                    | Vai trò                                                                                                  |
+| ---------------------------------------- | -------------------------------------------------------------------------------------------------------- |
+| **Khách hàng (Customer)**                | Đặt xe, theo dõi chuyến, thanh toán, xem lịch sử, đánh giá tài xế                                        |
+| **Tài xế (Driver)**                      | Quản lý hồ sơ/phương tiện, bật trạng thái sẵn sàng, nhận/từ chối chuyến, thực hiện chuyến                |
+| **Nhân viên vận hành (Operation Staff)** | Quản lý khách hàng, tài xế, phương tiện, chuyến, giao dịch, xử lý lỗi                                    |
+| **Payment Provider**                     | Xử lý giao dịch thanh toán điện tử                                                                       |
+| **Ban lãnh đạo**                         | Chủ yếu xem báo cáo, không nhất thiết là actor trực tiếp nếu báo cáo được Operation Staff khai thác thay |
+| **Notification Provider**                | Có thể xem là external actor nếu hệ thống tích hợp dịch vụ gửi thông báo bên ngoài                       |
+
+---
+
+# 2. Use Case của Khách hàng
+
+| Mã       | Use Case                         |
+| -------- | -------------------------------- |
+| **UC01** | Đăng ký tài khoản                |
+| **UC02** | Đăng nhập                        |
+| **UC03** | Cập nhật thông tin cá nhân       |
+| **UC04** | Tạo yêu cầu đặt xe               |
+| **UC05** | Chọn loại xe                     |
+| **UC06** | Theo dõi trạng thái tìm tài xế   |
+| **UC07** | Theo dõi chuyến đi               |
+| **UC08** | Xem thông tin tài xế             |
+| **UC09** | Xem thời gian tài xế dự kiến đến |
+| **UC10** | Thanh toán chuyến đi             |
+| **UC11** | Thanh toán tiền mặt              |
+| **UC12** | Thanh toán online                |
+| **UC13** | Xem lịch sử chuyến đi            |
+| **UC14** | Xem số tiền chuyến đi            |
+| **UC15** | Đánh giá tài xế                  |
+
+Các chức năng này bám theo yêu cầu khách hàng trong tài liệu. 
+
+---
+
+# 3. Use Case của Tài xế
+
+| Mã       | Use Case                       |
+| -------- | ------------------------------ |
+| **UC16** | Đăng ký tài khoản tài xế       |
+| **UC17** | Đăng nhập                      |
+| **UC18** | Cập nhật hồ sơ tài xế          |
+| **UC19** | Cập nhật thông tin phương tiện |
+| **UC20** | Cập nhật trạng thái hoạt động  |
+| **UC21** | Cập nhật vị trí                |
+| **UC22** | Nhận thông báo chuyến mới      |
+| **UC23** | Chấp nhận chuyến               |
+| **UC24** | Từ chối chuyến                 |
+| **UC25** | Cập nhật đã đến điểm đón       |
+| **UC26** | Cập nhật đã đón khách          |
+| **UC27** | Cập nhật đang di chuyển        |
+| **UC28** | Hoàn thành chuyến              |
+
+Tài xế phải có khả năng cập nhật hồ sơ, phương tiện, trạng thái làm việc, nhận/từ chối chuyến và cập nhật trạng thái trong quá trình thực hiện chuyến. 
+
+---
+
+# 4. Use Case của Nhân viên vận hành
+
+| Mã       | Use Case                     |
+| -------- | ---------------------------- |
+| **UC29** | Đăng nhập hệ thống quản trị  |
+| **UC30** | Quản lý khách hàng           |
+| **UC31** | Quản lý tài xế               |
+| **UC32** | Tạo tài khoản tài xế         |
+| **UC33** | Quản lý phương tiện          |
+| **UC34** | Quản lý chuyến đi            |
+| **UC35** | Theo dõi chuyến đang diễn ra |
+| **UC36** | Kiểm tra trạng thái tài xế   |
+| **UC37** | Hỗ trợ xử lý chuyến lỗi      |
+| **UC38** | Tra cứu lịch sử giao dịch    |
+| **UC39** | Quản lý phân quyền           |
+| **UC40** | Xem báo cáo thống kê         |
+
+Các chức năng quản trị được mô tả trực tiếp trong tài liệu. 
+
+---
+
+# 5. Use Case hệ thống tự động
+
+Một số chức năng không nhất thiết có actor con người trực tiếp kích hoạt, mà được CAB System thực hiện như một phần của nghiệp vụ.
+
+| Mã       | Use Case                        |
+| -------- | ------------------------------- |
+| **UC41** | Tìm tài xế phù hợp              |
+| **UC42** | Ưu tiên tài xế gần khách hàng   |
+| **UC43** | Gửi yêu cầu chuyến cho tài xế   |
+| **UC44** | Tìm tài xế khác khi bị từ chối  |
+| **UC45** | Thông báo không tìm được tài xế |
+| **UC46** | Tính cước chuyến đi             |
+| **UC47** | Gửi thông báo                   |
+| **UC48** | Ghi nhận giao dịch              |
+| **UC49** | Lưu lịch sử chuyến              |
+| **UC50** | Lưu Audit Log                   |
+
+Phần tìm và phân công tài xế là nghiệp vụ cốt lõi của hệ thống. 
+
+---
+
+# 6. Quan hệ `<<include>>`
+
+`<<include>>` dùng khi một Use Case **luôn cần thực hiện Use Case khác**.
+
+### Tạo yêu cầu đặt xe
+
+```text
+Tạo yêu cầu đặt xe
+        |
+        | <<include>>
+        v
+Nhập điểm đón
+        |
+        | <<include>>
+        v
+Nhập điểm đến
+        |
+        | <<include>>
+        v
+Chọn loại xe
+```
+
+Nên thiết kế:
+
+```text
+UC04 Tạo yêu cầu đặt xe
+   <<include>> Nhập điểm đón
+   <<include>> Nhập điểm đến
+   <<include>> UC05 Chọn loại xe
+   <<include>> UC41 Tìm tài xế phù hợp
+```
+
+---
+
+## 7. Quan hệ Matching
+
+```text
+Tạo yêu cầu đặt xe
+        |
+        | <<include>>
+        v
+Tìm tài xế phù hợp
+        |
+        | <<include>>
+        v
+Ưu tiên tài xế gần
+        |
+        | <<include>>
+        v
+Gửi yêu cầu cho tài xế
+```
+
+Nếu tài xế không nhận:
+
+```text
+Tìm tài xế khác
+        |
+        | <<extend>>
+        v
+Tìm tài xế phù hợp
+```
+
+Tài liệu yêu cầu nếu tài xế đầu tiên từ chối hoặc không phản hồi, hệ thống phải tiếp tục tìm tài xế khác. 
+
+---
+
+# 8. Quan hệ `<<extend>>`
+
+`<<extend>>` dùng khi chức năng chỉ xảy ra **trong một điều kiện cụ thể**.
+
+### Matching
+
+```text
+Tìm tài xế khác
+       <<extend>>
+Tìm tài xế phù hợp
+
+Điều kiện:
+Tài xế từ chối hoặc không phản hồi
+```
+
+### Thanh toán
+
+```text
+Thanh toán lại
+      <<extend>>
+Thanh toán online
+
+Điều kiện:
+Thanh toán thất bại
+```
+
+Tài liệu yêu cầu khi thanh toán điện tử thất bại, khách hàng được thông báo và xử lý lại theo chính sách doanh nghiệp. 
+
+---
+
+# 9. Thiết kế Payment Use Case
+
+Có thể mô hình:
+
+```text
+                 Thanh toán chuyến đi
+                         |
+                  ----------------
+                  |              |
+             <<extend>>       <<extend>>
+                  |              |
+          Thanh toán        Thanh toán
+           tiền mặt            online
+                                 |
+                             <<include>>
+                                 |
+                        Xử lý Payment Provider
+                                 |
+                             <<extend>>
+                                 |
+                        Xử lý thanh toán lỗi
+```
+
+Nếu dùng UML chặt hơn, `Thanh toán tiền mặt` và `Thanh toán online` cũng có thể được mô hình hóa bằng **generalization** từ `Thanh toán chuyến đi`, vì đây là hai phương thức thay thế cho cùng một mục tiêu.
+
+---
+
+# 10. Thiết kế trạng thái chuyến
+
+Không nên tách mọi trạng thái thành Use Case độc lập nếu sơ đồ tổng thể trở nên quá rối.
+
+Có thể gom thành:
+
+```text
+Thực hiện chuyến đi
+      |
+      | <<include>>
+      v
+Cập nhật trạng thái chuyến
+```
+
+Trong đặc tả của `Cập nhật trạng thái chuyến` ghi:
+
+* Đã đến điểm đón
+* Đã đón khách
+* Đang di chuyển
+* Hoàn thành chuyến
+
+Cách này **gọn và dễ chấm hơn** so với vẽ 4 oval riêng trên Use Case Diagram chính.
+
+---
+
+# 11. Bộ Use Case nên dùng cho sơ đồ chính
+
+Nếu đưa toàn bộ 50 UC lên một hình thì sơ đồ sẽ quá rối. Tôi đề xuất **Use Case Diagram chính chỉ dùng khoảng 20–24 Use Case**:
+
+### Khách hàng
+
+```text
+Đăng ký
+Đăng nhập
+Quản lý thông tin cá nhân
+Đặt xe
+Theo dõi chuyến
+Thanh toán
+Xem lịch sử
+Đánh giá tài xế
+```
+
+### Tài xế
+
+```text
+Đăng nhập
+Quản lý hồ sơ
+Quản lý phương tiện
+Cập nhật trạng thái hoạt động
+Cập nhật vị trí
+Nhận/Từ chối chuyến
+Thực hiện chuyến
+```
+
+### Nhân viên vận hành
+
+```text
+Đăng nhập
+Quản lý khách hàng
+Quản lý tài xế
+Quản lý phương tiện
+Quản lý chuyến
+Xử lý chuyến lỗi
+Tra cứu giao dịch
+Xem báo cáo
+Quản lý phân quyền
+```
+
+### External Actor
+
+```text
+Payment Provider
+        |
+        |
+Thanh toán online
+```
+
+---
+
+# 12. Mermaid Use Case dạng flowchart
+
+Mermaid không có Use Case Diagram UML chuẩn hoàn toàn, nhưng có thể mô phỏng để bạn xem bố cục:
+
+```mermaid
+flowchart LR
+
+    Customer[👤 Khách hàng]
+    Driver[👤 Tài xế]
+    Staff[👤 Nhân viên vận hành]
+    Payment[Payment Provider]
+
+    subgraph CAB["CAB SYSTEM"]
+
+        UC01([Đăng ký / Đăng nhập])
+        UC02([Quản lý thông tin cá nhân])
+        UC03([Đặt xe])
+        UC04([Tìm tài xế])
+        UC05([Theo dõi chuyến])
+        UC06([Thanh toán])
+        UC07([Thanh toán online])
+        UC08([Xem lịch sử chuyến])
+        UC09([Đánh giá tài xế])
+
+        UC10([Quản lý hồ sơ tài xế])
+        UC11([Quản lý phương tiện])
+        UC12([Cập nhật trạng thái hoạt động])
+        UC13([Cập nhật vị trí])
+        UC14([Nhận / Từ chối chuyến])
+        UC15([Thực hiện chuyến])
+
+        UC16([Quản lý khách hàng])
+        UC17([Quản lý tài xế])
+        UC18([Quản lý phương tiện])
+        UC19([Quản lý chuyến])
+        UC20([Xử lý chuyến lỗi])
+        UC21([Tra cứu giao dịch])
+        UC22([Quản lý phân quyền])
+        UC23([Xem báo cáo])
+    end
+
+    Customer --> UC01
+    Customer --> UC02
+    Customer --> UC03
+    Customer --> UC05
+    Customer --> UC06
+    Customer --> UC08
+    Customer --> UC09
+
+    UC03 -. include .-> UC04
+    UC06 -. extend .-> UC07
+
+    Payment --> UC07
+
+    Driver --> UC01
+    Driver --> UC10
+    Driver --> UC11
+    Driver --> UC12
+    Driver --> UC13
+    Driver --> UC14
+    Driver --> UC15
+
+    Staff --> UC01
+    Staff --> UC16
+    Staff --> UC17
+    Staff --> UC18
+    Staff --> UC19
+    Staff --> UC20
+    Staff --> UC21
+    Staff --> UC22
+    Staff --> UC23
+```
+Dựa trên toàn bộ yêu cầu trong **Customer-Requirement.docx**, tôi đề xuất đặc tả ở mức **Use Case chính**, không tách những thao tác rất nhỏ thành một đặc tả riêng. Như vậy sẽ dễ chuyển sang Activity/Sequence Diagram hơn và không làm số lượng Use Case bị phình quá mức. 
+
+# ĐẶC TẢ USE CASE – CAB SYSTEM
+
+## UC01 – Đăng ký tài khoản khách hàng
+
+| Thuộc tính         | Nội dung                                                                   |
+| ------------------ | -------------------------------------------------------------------------- |
+| **Use Case ID**    | UC01                                                                       |
+| **Tên Use Case**   | Đăng ký tài khoản khách hàng                                               |
+| **Actor chính**    | Khách hàng                                                                 |
+| **Mô tả**          | Cho phép khách hàng tạo tài khoản để sử dụng các chức năng của CAB System. |
+| **Tiền điều kiện** | Khách hàng chưa có tài khoản hợp lệ trong hệ thống.                        |
+| **Hậu điều kiện**  | Tài khoản khách hàng được tạo và có thể sử dụng để đăng nhập.              |
+| **Trigger**        | Khách hàng chọn chức năng đăng ký.                                         |
+
+### Main Flow
+
+1. Khách hàng chọn **Đăng ký**.
+2. Hệ thống hiển thị biểu mẫu đăng ký.
+3. Khách hàng nhập thông tin cần thiết.
+4. Khách hàng gửi yêu cầu đăng ký.
+5. Hệ thống kiểm tra thông tin.
+6. Hệ thống tạo tài khoản khách hàng.
+7. Hệ thống thông báo đăng ký thành công.
+
+### Alternative Flow
+
+* A1. Khách hàng chỉnh sửa thông tin trước khi gửi yêu cầu.
+
+### Exception Flow
+
+* E1. Thông tin đăng ký không hợp lệ → hệ thống thông báo và yêu cầu nhập lại.
+* E2. Thông tin tài khoản đã tồn tại → hệ thống từ chối tạo mới.
+
+---
+
+## UC02 – Đăng nhập
+
+| Thuộc tính         | Nội dung                                                               |
+| ------------------ | ---------------------------------------------------------------------- |
+| **Use Case ID**    | UC02                                                                   |
+| **Tên Use Case**   | Đăng nhập                                                              |
+| **Actor chính**    | Khách hàng, Tài xế, Nhân viên vận hành                                 |
+| **Mô tả**          | Xác thực người dùng trước khi sử dụng các chức năng yêu cầu tài khoản. |
+| **Tiền điều kiện** | Người dùng đã có tài khoản.                                            |
+| **Hậu điều kiện**  | Người dùng được xác thực và truy cập các chức năng theo quyền.         |
+| **Trigger**        | Người dùng chọn đăng nhập.                                             |
+
+### Main Flow
+
+1. Người dùng nhập thông tin đăng nhập.
+2. Hệ thống tiếp nhận thông tin.
+3. Hệ thống xác thực tài khoản.
+4. Hệ thống xác định quyền của người dùng.
+5. Hệ thống cho phép truy cập.
+
+### Exception Flow
+
+* E1. Thông tin đăng nhập không chính xác → thông báo đăng nhập thất bại.
+* E2. Người dùng không có quyền truy cập chức năng yêu cầu → từ chối truy cập.
+
+---
+
+## UC03 – Cập nhật thông tin cá nhân
+
+| Thuộc tính         | Nội dung                             |
+| ------------------ | ------------------------------------ |
+| **Use Case ID**    | UC03                                 |
+| **Tên Use Case**   | Cập nhật thông tin cá nhân           |
+| **Actor chính**    | Khách hàng                           |
+| **Tiền điều kiện** | Khách hàng đã đăng nhập.             |
+| **Hậu điều kiện**  | Thông tin mới được lưu vào hệ thống. |
+
+### Main Flow
+
+1. Khách hàng mở hồ sơ cá nhân.
+2. Hệ thống hiển thị thông tin hiện tại.
+3. Khách hàng chỉnh sửa thông tin.
+4. Khách hàng chọn lưu.
+5. Hệ thống kiểm tra dữ liệu.
+6. Hệ thống cập nhật thông tin.
+7. Hệ thống thông báo thành công.
+
+### Exception Flow
+
+* E1. Thông tin không hợp lệ → yêu cầu chỉnh sửa.
+
+---
+
+# NHÓM ĐẶT XE VÀ MATCHING
+
+## UC04 – Đặt xe
+
+| Thuộc tính         | Nội dung                                                     |
+| ------------------ | ------------------------------------------------------------ |
+| **Use Case ID**    | UC04                                                         |
+| **Tên Use Case**   | Đặt xe                                                       |
+| **Actor chính**    | Khách hàng                                                   |
+| **Mô tả**          | Cho phép khách hàng tạo yêu cầu chuyến đi.                   |
+| **Tiền điều kiện** | Khách hàng đã đăng nhập.                                     |
+| **Hậu điều kiện**  | Yêu cầu đặt xe được ghi nhận và hệ thống bắt đầu tìm tài xế. |
+| **Trigger**        | Khách hàng có nhu cầu đặt xe.                                |
+| **Include**        | Tìm và phân công tài xế                                      |
+
+### Main Flow
+
+1. Khách hàng chọn chức năng đặt xe.
+2. Khách hàng nhập điểm đón.
+3. Khách hàng nhập điểm đến.
+4. Khách hàng lựa chọn loại xe.
+5. Khách hàng xác nhận yêu cầu.
+6. Hệ thống tạo yêu cầu đặt xe.
+7. Hệ thống thông báo đã tiếp nhận yêu cầu.
+8. Hệ thống chuyển sang quá trình tìm tài xế.
+
+### Exception Flow
+
+* E1. Thiếu điểm đón hoặc điểm đến → không cho phép gửi yêu cầu.
+* E2. Không tìm được tài xế → thông báo cho khách hàng.
+
+---
+
+## UC05 – Tìm và phân công tài xế
+
+| Thuộc tính         | Nội dung                                                                          |
+| ------------------ | --------------------------------------------------------------------------------- |
+| **Use Case ID**    | UC05                                                                              |
+| **Tên Use Case**   | Tìm và phân công tài xế                                                           |
+| **Actor chính**    | Khách hàng                                                                        |
+| **Actor phụ**      | Tài xế                                                                            |
+| **Mô tả**          | Hệ thống tự động xác định và đề xuất tài xế phù hợp cho yêu cầu chuyến.           |
+| **Tiền điều kiện** | Có yêu cầu đặt xe hợp lệ.                                                         |
+| **Hậu điều kiện**  | Tài xế được ghép với chuyến hoặc khách hàng được thông báo không tìm được tài xế. |
+
+### Main Flow
+
+1. Hệ thống nhận yêu cầu đặt xe.
+2. Hệ thống tìm tài xế đang ở trạng thái sẵn sàng.
+3. Hệ thống kiểm tra vị trí và tiêu chí phù hợp.
+4. Hệ thống ưu tiên tài xế phù hợp và gần khách hàng.
+5. Hệ thống gửi yêu cầu chuyến cho tài xế.
+6. Tài xế nhận thông báo.
+7. Tài xế chấp nhận chuyến.
+8. Hệ thống ghép tài xế với chuyến.
+9. Hệ thống thông báo cho khách hàng.
+
+### Alternative Flow
+
+* A1. Tài xế từ chối → hệ thống tiếp tục tìm tài xế khác.
+* A2. Tài xế không phản hồi → sau thời gian phản hồi quy định, hệ thống tìm tài xế khác.
+
+### Exception Flow
+
+* E1. Không còn tài xế phù hợp → hệ thống thông báo không tìm được tài xế.
+
+> **TBD:** thời gian phản hồi và tiêu chí ưu tiên chi tiết chưa được khách hàng chốt.
+
+---
+
+## UC06 – Chấp nhận/Từ chối chuyến
+
+| Thuộc tính         | Nội dung                                                    |
+| ------------------ | ----------------------------------------------------------- |
+| **Use Case ID**    | UC06                                                        |
+| **Tên Use Case**   | Chấp nhận/Từ chối chuyến                                    |
+| **Actor chính**    | Tài xế                                                      |
+| **Tiền điều kiện** | Tài xế đang sẵn sàng và nhận được yêu cầu chuyến.           |
+| **Hậu điều kiện**  | Chuyến được nhận hoặc hệ thống chuyển sang tìm tài xế khác. |
+
+### Main Flow
+
+1. Tài xế nhận thông báo chuyến mới.
+2. Hệ thống hiển thị thông tin chuyến.
+3. Tài xế chọn **Chấp nhận**.
+4. Hệ thống ghi nhận phản hồi.
+5. Hệ thống phân công chuyến cho tài xế.
+6. Hệ thống thông báo cho khách hàng.
+
+### Alternative Flow
+
+* A1. Tài xế chọn **Từ chối** → hệ thống ghi nhận và tìm tài xế khác.
+* A2. Tài xế không phản hồi → hệ thống xử lý theo thời gian phản hồi quy định.
+
+---
+
+# NHÓM THỰC HIỆN CHUYẾN
+
+## UC07 – Thực hiện chuyến đi
+
+| Thuộc tính         | Nội dung                               |
+| ------------------ | -------------------------------------- |
+| **Use Case ID**    | UC07                                   |
+| **Tên Use Case**   | Thực hiện chuyến đi                    |
+| **Actor chính**    | Tài xế                                 |
+| **Actor phụ**      | Khách hàng                             |
+| **Tiền điều kiện** | Tài xế đã chấp nhận chuyến.            |
+| **Hậu điều kiện**  | Chuyến được cập nhật thành hoàn thành. |
+
+### Main Flow
+
+1. Tài xế di chuyển đến điểm đón.
+2. Tài xế cập nhật **Đã đến điểm đón**.
+3. Hệ thống thông báo cho khách hàng.
+4. Tài xế đón khách.
+5. Tài xế cập nhật **Đã đón khách**.
+6. Tài xế cập nhật **Đang di chuyển**.
+7. Tài xế di chuyển đến điểm đến.
+8. Tài xế chọn **Hoàn thành chuyến**.
+9. Hệ thống cập nhật trạng thái chuyến.
+10. Hệ thống chuyển sang tính cước.
+
+### Exception Flow
+
+* E1. Mất kết nối mạng trong quá trình thực hiện chuyến → **chưa có quy tắc xử lý, cần BA xác nhận**.
+* E2. Khách hàng hoặc tài xế hủy chuyến → **chính sách hủy chưa được khách hàng chốt**.
+
+---
+
+## UC08 – Theo dõi chuyến đi
+
+| Thuộc tính         | Nội dung                                            |
+| ------------------ | --------------------------------------------------- |
+| **Use Case ID**    | UC08                                                |
+| **Tên Use Case**   | Theo dõi chuyến đi                                  |
+| **Actor chính**    | Khách hàng                                          |
+| **Tiền điều kiện** | Khách hàng có yêu cầu/chuyến đang hoạt động.        |
+| **Hậu điều kiện**  | Khách hàng xem được trạng thái hiện tại của chuyến. |
+
+### Main Flow
+
+1. Khách hàng mở chuyến hiện tại.
+2. Hệ thống hiển thị trạng thái tìm tài xế hoặc trạng thái chuyến.
+3. Khi đã có tài xế, hệ thống hiển thị tài xế nhận chuyến.
+4. Hệ thống hiển thị thời gian dự kiến tài xế đến.
+5. Hệ thống cập nhật trạng thái trong quá trình thực hiện chuyến.
+
+---
+
+# NHÓM TÍNH CƯỚC VÀ THANH TOÁN
+
+## UC09 – Tính cước chuyến đi
+
+| Thuộc tính         | Nội dung                        |
+| ------------------ | ------------------------------- |
+| **Use Case ID**    | UC09                            |
+| **Tên Use Case**   | Tính cước chuyến đi             |
+| **Actor chính**    | Hệ thống                        |
+| **Tiền điều kiện** | Chuyến đã hoàn thành.           |
+| **Hậu điều kiện**  | Số tiền phải trả được xác định. |
+
+### Main Flow
+
+1. Hệ thống nhận trạng thái hoàn thành chuyến.
+2. Hệ thống lấy loại dịch vụ.
+3. Hệ thống lấy thông tin chuyến đi.
+4. Hệ thống áp dụng quy tắc tính cước.
+5. Hệ thống xác định số tiền phải trả.
+6. Hệ thống hiển thị số tiền cho khách hàng.
+
+### Exception Flow
+
+* E1. Thiếu dữ liệu cần thiết để tính cước → ghi nhận lỗi để xử lý.
+
+> **TBD:** Công thức và chính sách tính cước chưa được khách hàng xác định.
+
+---
+
+## UC10 – Thanh toán chuyến đi
+
+| Thuộc tính         | Nội dung                                     |
+| ------------------ | -------------------------------------------- |
+| **Use Case ID**    | UC10                                         |
+| **Tên Use Case**   | Thanh toán chuyến đi                         |
+| **Actor chính**    | Khách hàng                                   |
+| **Actor phụ**      | Payment Provider                             |
+| **Tiền điều kiện** | Chuyến đã hoàn thành và có số tiền phải trả. |
+| **Hậu điều kiện**  | Kết quả thanh toán được ghi nhận.            |
+
+### Main Flow – Tiền mặt
+
+1. Hệ thống hiển thị số tiền.
+2. Khách hàng chọn thanh toán tiền mặt.
+3. Hệ thống ghi nhận phương thức thanh toán.
+4. Giao dịch được ghi nhận.
+
+### Alternative Flow – Thanh toán online
+
+1. Khách hàng chọn thanh toán online.
+2. CAB gửi yêu cầu đến Payment Provider.
+3. Payment Provider xử lý giao dịch.
+4. CAB nhận kết quả.
+5. Hệ thống ghi nhận thanh toán thành công.
+6. Hệ thống thông báo kết quả.
+
+### Exception Flow
+
+* E1. Thanh toán online thất bại → thông báo cho khách hàng.
+* E2. Cho phép xử lý lại theo chính sách doanh nghiệp.
+* E3. Payment Provider gặp lỗi → không được làm toàn bộ hệ thống đặt xe dừng.
+
+---
+
+# NHÓM THÔNG BÁO
+
+## UC11 – Gửi thông báo
+
+| Thuộc tính       | Nội dung                                                |
+| ---------------- | ------------------------------------------------------- |
+| **Use Case ID**  | UC11                                                    |
+| **Tên Use Case** | Gửi thông báo                                           |
+| **Actor chính**  | Hệ thống                                                |
+| **Actor phụ**    | Khách hàng, Tài xế                                      |
+| **Mô tả**        | Thông báo các sự kiện quan trọng trong vòng đời chuyến. |
+
+### Main Flow
+
+1. Một sự kiện nghiệp vụ xảy ra.
+2. Hệ thống xác định loại thông báo.
+3. Hệ thống xác định người nhận.
+4. Hệ thống gửi thông báo.
+5. Ghi nhận kết quả gửi.
+
+### Các sự kiện chính
+
+* Yêu cầu đặt xe được tiếp nhận.
+* Có tài xế nhận chuyến.
+* Tài xế đến điểm đón.
+* Chuyến hoàn thành.
+* Thanh toán có kết quả.
+* Có chuyến mới dành cho tài xế.
+* Có thay đổi liên quan đến chuyến.
+
+### Exception Flow
+
+* E1. Dịch vụ thông báo gặp lỗi → không được làm quy trình đặt xe dừng.
+* E2. Cơ chế retry/fallback cụ thể chưa được khách hàng xác định.
+
+---
+
+# NHÓM LỊCH SỬ VÀ ĐÁNH GIÁ
+
+## UC12 – Xem lịch sử chuyến đi
+
+| Thuộc tính         | Nội dung                                      |
+| ------------------ | --------------------------------------------- |
+| **Use Case ID**    | UC12                                          |
+| **Tên Use Case**   | Xem lịch sử chuyến đi                         |
+| **Actor chính**    | Khách hàng                                    |
+| **Tiền điều kiện** | Khách hàng đã đăng nhập.                      |
+| **Hậu điều kiện**  | Danh sách và thông tin lịch sử được hiển thị. |
+
+### Main Flow
+
+1. Khách hàng chọn lịch sử chuyến.
+2. Hệ thống lấy các chuyến của khách hàng.
+3. Hệ thống hiển thị danh sách.
+4. Khách hàng chọn một chuyến.
+5. Hệ thống hiển thị chi tiết và số tiền chuyến.
+
+---
+
+## UC13 – Đánh giá tài xế
+
+| Thuộc tính         | Nội dung              |
+| ------------------ | --------------------- |
+| **Use Case ID**    | UC13                  |
+| **Tên Use Case**   | Đánh giá tài xế       |
+| **Actor chính**    | Khách hàng            |
+| **Tiền điều kiện** | Chuyến đã hoàn thành. |
+| **Hậu điều kiện**  | Đánh giá được lưu.    |
+
+### Main Flow
+
+1. Khách hàng mở chuyến đã hoàn thành.
+2. Khách hàng chọn đánh giá tài xế.
+3. Khách hàng nhập đánh giá.
+4. Khách hàng gửi đánh giá.
+5. Hệ thống kiểm tra dữ liệu.
+6. Hệ thống lưu đánh giá.
+7. Hệ thống thông báo thành công.
+
+---
+
+# NHÓM TÀI XẾ VÀ PHƯƠNG TIỆN
+
+## UC14 – Quản lý hồ sơ tài xế
+
+| Thuộc tính         | Nội dung                    |
+| ------------------ | --------------------------- |
+| **Use Case ID**    | UC14                        |
+| **Tên Use Case**   | Quản lý hồ sơ tài xế        |
+| **Actor chính**    | Tài xế                      |
+| **Tiền điều kiện** | Tài xế đã đăng nhập.        |
+| **Hậu điều kiện**  | Hồ sơ tài xế được cập nhật. |
+
+### Main Flow
+
+1. Tài xế mở hồ sơ.
+2. Hệ thống hiển thị thông tin.
+3. Tài xế chỉnh sửa.
+4. Tài xế lưu.
+5. Hệ thống kiểm tra và cập nhật.
+
+---
+
+## UC15 – Quản lý phương tiện
+
+| Thuộc tính       | Nội dung                                                             |
+| ---------------- | -------------------------------------------------------------------- |
+| **Use Case ID**  | UC15                                                                 |
+| **Tên Use Case** | Quản lý phương tiện                                                  |
+| **Actor chính**  | Tài xế, Nhân viên vận hành                                           |
+| **Mô tả**        | Cho phép quản lý thông tin phương tiện phục vụ hoạt động vận chuyển. |
+
+### Main Flow
+
+1. Actor truy cập thông tin phương tiện.
+2. Hệ thống hiển thị dữ liệu hiện tại.
+3. Actor cập nhật thông tin.
+4. Hệ thống kiểm tra.
+5. Hệ thống lưu thông tin.
+
+---
+
+## UC16 – Cập nhật trạng thái hoạt động và vị trí
+
+| Thuộc tính         | Nội dung                                 |
+| ------------------ | ---------------------------------------- |
+| **Use Case ID**    | UC16                                     |
+| **Tên Use Case**   | Cập nhật trạng thái hoạt động và vị trí  |
+| **Actor chính**    | Tài xế                                   |
+| **Tiền điều kiện** | Tài xế đã đăng nhập.                     |
+| **Hậu điều kiện**  | Trạng thái/vị trí mới được CAB ghi nhận. |
+
+### Main Flow
+
+1. Tài xế chuyển sang trạng thái sẵn sàng nhận chuyến.
+2. Hệ thống ghi nhận trạng thái.
+3. CAB ghi nhận/cập nhật vị trí tài xế.
+4. Dữ liệu được sử dụng cho quá trình tìm tài xế.
+
+---
+
+# NHÓM QUẢN TRỊ VẬN HÀNH
+
+## UC17 – Quản lý khách hàng
+
+| Thuộc tính         | Nội dung                                    |
+| ------------------ | ------------------------------------------- |
+| **Use Case ID**    | UC17                                        |
+| **Tên Use Case**   | Quản lý khách hàng                          |
+| **Actor chính**    | Nhân viên vận hành                          |
+| **Tiền điều kiện** | Nhân viên đã đăng nhập và có quyền.         |
+| **Hậu điều kiện**  | Thông tin khách hàng được quản lý/cập nhật. |
+
+### Main Flow
+
+1. Nhân viên mở chức năng quản lý khách hàng.
+2. Hệ thống hiển thị dữ liệu.
+3. Nhân viên tìm kiếm/xem thông tin.
+4. Nhân viên thực hiện thao tác được cấp quyền.
+5. Hệ thống lưu thay đổi.
+6. Hệ thống ghi Audit Log đối với thao tác quan trọng.
+
+---
+
+## UC18 – Quản lý tài xế
+
+| Thuộc tính         | Nội dung                       |
+| ------------------ | ------------------------------ |
+| **Use Case ID**    | UC18                           |
+| **Tên Use Case**   | Quản lý tài xế                 |
+| **Actor chính**    | Nhân viên vận hành             |
+| **Tiền điều kiện** | Nhân viên có quyền phù hợp.    |
+| **Hậu điều kiện**  | Thông tin tài xế được quản lý. |
+
+### Main Flow
+
+1. Nhân viên truy cập danh sách tài xế.
+2. Hệ thống hiển thị thông tin.
+3. Nhân viên tìm kiếm/xem tài xế.
+4. Nhân viên có thể tạo tài khoản tài xế.
+5. Nhân viên thực hiện các thao tác được cấp quyền.
+6. Hệ thống lưu thay đổi.
+
+---
+
+## UC19 – Quản lý và theo dõi chuyến đi
+
+| Thuộc tính         | Nội dung                                 |
+| ------------------ | ---------------------------------------- |
+| **Use Case ID**    | UC19                                     |
+| **Tên Use Case**   | Quản lý và theo dõi chuyến đi            |
+| **Actor chính**    | Nhân viên vận hành                       |
+| **Tiền điều kiện** | Nhân viên đã đăng nhập.                  |
+| **Hậu điều kiện**  | Trạng thái chuyến được theo dõi/quản lý. |
+
+### Main Flow
+
+1. Nhân viên mở danh sách chuyến.
+2. Hệ thống hiển thị các chuyến đang diễn ra.
+3. Nhân viên chọn chuyến cần xem.
+4. Hệ thống hiển thị trạng thái chuyến và tài xế.
+5. Nhân viên theo dõi hoạt động.
+
+### Alternative Flow
+
+* A1. Chuyến gặp lỗi → chuyển sang UC20 – Hỗ trợ xử lý chuyến lỗi.
+
+---
+
+## UC20 – Hỗ trợ xử lý chuyến lỗi
+
+| Thuộc tính         | Nội dung                                             |
+| ------------------ | ---------------------------------------------------- |
+| **Use Case ID**    | UC20                                                 |
+| **Tên Use Case**   | Hỗ trợ xử lý chuyến lỗi                              |
+| **Actor chính**    | Nhân viên vận hành                                   |
+| **Tiền điều kiện** | Có chuyến phát sinh vấn đề.                          |
+| **Hậu điều kiện**  | Sự cố được ghi nhận/xử lý theo chính sách nghiệp vụ. |
+
+### Main Flow
+
+1. Nhân viên xác định chuyến có vấn đề.
+2. Hệ thống hiển thị thông tin chuyến.
+3. Nhân viên kiểm tra trạng thái khách hàng/tài xế/chuyến.
+4. Nhân viên thực hiện thao tác hỗ trợ trong phạm vi quyền.
+5. Hệ thống lưu thay đổi.
+6. Hệ thống ghi Audit Log.
+
+### Exception Flow
+
+* E1. Nhân viên không có quyền → từ chối thao tác.
+* E2. Quy trình xử lý thuộc trường hợp chưa có chính sách → chuyển để xác nhận nghiệp vụ.
+
+---
+
+## UC21 – Tra cứu lịch sử giao dịch
+
+| Thuộc tính         | Nội dung                            |
+| ------------------ | ----------------------------------- |
+| **Use Case ID**    | UC21                                |
+| **Tên Use Case**   | Tra cứu lịch sử giao dịch           |
+| **Actor chính**    | Nhân viên vận hành                  |
+| **Tiền điều kiện** | Nhân viên đã đăng nhập và có quyền. |
+| **Hậu điều kiện**  | Thông tin giao dịch được hiển thị.  |
+
+### Main Flow
+
+1. Nhân viên mở chức năng tra cứu giao dịch.
+2. Nhân viên nhập điều kiện tìm kiếm.
+3. Hệ thống tìm dữ liệu.
+4. Hệ thống hiển thị kết quả.
+5. Nhân viên xem chi tiết giao dịch.
+
+---
+
+## UC22 – Quản lý phân quyền
+
+| Thuộc tính         | Nội dung                                       |
+| ------------------ | ---------------------------------------------- |
+| **Use Case ID**    | UC22                                           |
+| **Tên Use Case**   | Quản lý phân quyền                             |
+| **Actor chính**    | Nhân viên quản trị có quyền                    |
+| **Tiền điều kiện** | Actor đã đăng nhập và được cấp quyền quản trị. |
+| **Hậu điều kiện**  | Quyền truy cập được cập nhật.                  |
+
+### Main Flow
+
+1. Actor truy cập chức năng phân quyền.
+2. Hệ thống hiển thị danh sách vai trò/quyền.
+3. Actor điều chỉnh quyền.
+4. Hệ thống kiểm tra quyền của actor.
+5. Hệ thống lưu thay đổi.
+6. Hệ thống ghi Audit Log.
+
+### Exception Flow
+
+* E1. Actor không đủ quyền → từ chối thao tác.
+
+## UC23 – Xem báo cáo thống kê
+
+| Thuộc tính         | Nội dung                          |
+| ------------------ | --------------------------------- |
+| **Use Case ID**    | UC23                              |
+| **Tên Use Case**   | Xem báo cáo thống kê              |
+| **Actor chính**    | Ban lãnh đạo / Nhân viên có quyền |
+| **Tiền điều kiện** | Actor được phép truy cập báo cáo. |
+| **Hậu điều kiện**  | Báo cáo được hiển thị.            |
+
+### Main Flow
+
+1. Actor mở chức năng báo cáo.
+2. Actor chọn loại báo cáo.
+3. Hệ thống tổng hợp dữ liệu.
+4. Hệ thống hiển thị kết quả.
+
+### Các báo cáo
+
+* Số lượng chuyến.
+* Doanh thu.
+* Tỷ lệ chuyến hoàn thành.
+* Tỷ lệ chuyến hủy.
+* Hiệu quả hoạt động
