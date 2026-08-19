@@ -3124,3 +3124,588 @@ Dựa trên toàn bộ yêu cầu trong **Customer-Requirement.docx**, tôi đ�
 * Tỷ lệ chuyến hoàn thành.
 * Tỷ lệ chuyến hủy.
 * Hiệu quả hoạt động
+
+# BƯỚC 12: XÁC ĐỊNH TIÊU CHÍ CHẤP NHẬN – ACCEPTANCE CRITERIA (AC)
+
+**Acceptance Criteria (AC)** là các điều kiện cụ thể để xác định một chức năng/Use Case **được xem là đáp ứng yêu cầu hay chưa**.
+
+Có thể hiểu chuỗi:
+
+**Business Requirement → Functional Requirement → Use Case → Acceptance Criteria**
+
+Với CAB System, nên viết AC theo dạng **Given – When – Then**:
+
+* **Given:** Điều kiện ban đầu.
+* **When:** Hành động/sự kiện xảy ra.
+* **Then:** Kết quả hệ thống bắt buộc phải đạt.
+
+---
+
+## 1. AC – Đăng ký tài khoản
+
+### AC01 – Đăng ký thành công
+
+**Given:** Khách hàng chưa có tài khoản và cung cấp thông tin đăng ký hợp lệ.
+**When:** Khách hàng gửi yêu cầu đăng ký.
+**Then:** Hệ thống tạo tài khoản và thông báo đăng ký thành công.
+
+### AC02 – Thông tin không hợp lệ
+
+**Given:** Khách hàng đang đăng ký.
+**When:** Thông tin đăng ký không hợp lệ.
+**Then:** Hệ thống không tạo tài khoản và thông báo để khách hàng chỉnh sửa.
+
+---
+
+# 2. AC – Đăng nhập
+
+### AC03 – Đăng nhập thành công
+
+**Given:** Người dùng có tài khoản hợp lệ.
+**When:** Người dùng nhập đúng thông tin đăng nhập.
+**Then:** Hệ thống xác thực thành công và cho phép truy cập các chức năng phù hợp với quyền.
+
+### AC04 – Đăng nhập thất bại
+
+**Given:** Người dùng đang ở màn hình đăng nhập.
+**When:** Người dùng cung cấp thông tin xác thực không chính xác.
+**Then:** Hệ thống từ chối đăng nhập và thông báo thất bại.
+
+---
+
+# 3. AC – Đặt xe
+
+### AC05 – Tạo yêu cầu đặt xe thành công
+
+**Given:** Khách hàng đã đăng nhập.
+**When:** Khách hàng nhập điểm đón, điểm đến, chọn loại xe và xác nhận đặt xe.
+**Then:** Hệ thống tạo yêu cầu đặt xe và bắt đầu quá trình tìm tài xế.
+
+### AC06 – Thiếu thông tin chuyến
+
+**Given:** Khách hàng đang tạo yêu cầu đặt xe.
+**When:** Điểm đón, điểm đến hoặc loại xe chưa đầy đủ.
+**Then:** Hệ thống không gửi yêu cầu đặt xe và yêu cầu khách hàng bổ sung thông tin.
+
+Yêu cầu nguồn xác định khách hàng cần cung cấp điểm đón, điểm đến và lựa chọn loại xe. 
+
+---
+
+# 4. AC – Tìm và phân công tài xế
+
+Đây là nhóm AC quan trọng nhất đối với **BG02 – giảm thời gian tìm tài xế**.
+
+### AC07 – Chỉ tìm tài xế sẵn sàng
+
+**Given:** Có yêu cầu đặt xe hợp lệ.
+**When:** Hệ thống bắt đầu tìm tài xế.
+**Then:** Hệ thống chỉ xem xét các tài xế có trạng thái sẵn sàng và đáp ứng tiêu chí phù hợp.
+
+### AC08 – Ưu tiên tài xế phù hợp/gần khách
+
+**Given:** Có nhiều tài xế phù hợp.
+**When:** Hệ thống lựa chọn tài xế để gửi yêu cầu.
+**Then:** Hệ thống ưu tiên tài xế phù hợp và gần khách hàng theo tiêu chí vận hành.
+
+### AC09 – Tài xế chấp nhận
+
+**Given:** Tài xế nhận được yêu cầu chuyến.
+**When:** Tài xế chấp nhận.
+**Then:** Hệ thống ghép tài xế với chuyến và thông báo cho khách hàng.
+
+### AC10 – Tài xế từ chối
+
+**Given:** Một tài xế đã nhận được yêu cầu chuyến.
+**When:** Tài xế từ chối.
+**Then:** Hệ thống tiếp tục tìm tài xế khác mà khách hàng **không phải tạo lại yêu cầu**.
+
+### AC11 – Tài xế không phản hồi
+
+**Given:** Hệ thống đã gửi yêu cầu chuyến cho tài xế.
+**When:** Tài xế không phản hồi trong thời gian quy định.
+**Then:** Hệ thống chuyển sang tìm tài xế khác.
+
+> Thời gian phản hồi cụ thể hiện là **TBD**, vì khách hàng chưa chốt.
+
+### AC12 – Không tìm được tài xế
+
+**Given:** Hệ thống đang tìm tài xế.
+**When:** Không còn tài xế phù hợp.
+**Then:** Hệ thống thông báo rõ ràng cho khách hàng rằng không tìm được tài xế.
+
+Các AC07–AC12 bám trực tiếp yêu cầu matching của CAB. 
+
+---
+
+# 5. AC – Thực hiện chuyến đi
+
+### AC13 – Tài xế đến điểm đón
+
+**Given:** Tài xế đã nhận chuyến.
+**When:** Tài xế cập nhật trạng thái đã đến điểm đón.
+**Then:** Hệ thống cập nhật trạng thái chuyến và thông báo cho khách hàng.
+
+### AC14 – Đã đón khách
+
+**Given:** Tài xế đã đến điểm đón.
+**When:** Tài xế xác nhận đã đón khách.
+**Then:** Hệ thống cập nhật trạng thái **Đã đón khách**.
+
+### AC15 – Đang thực hiện chuyến
+
+**Given:** Tài xế đã đón khách.
+**When:** Chuyến bắt đầu di chuyển.
+**Then:** Hệ thống ghi nhận trạng thái **Đang di chuyển**.
+
+### AC16 – Hoàn thành chuyến
+
+**Given:** Chuyến đang được thực hiện.
+**When:** Tài xế xác nhận hoàn thành chuyến.
+**Then:** Hệ thống cập nhật trạng thái **Hoàn thành** và chuyển sang quá trình tính cước.
+
+Các trạng thái này được yêu cầu trong phần nghiệp vụ tài xế. 
+
+---
+
+# 6. AC – Theo dõi chuyến
+
+### AC17 – Theo dõi tìm tài xế
+
+**Given:** Khách hàng đã gửi yêu cầu đặt xe.
+**When:** Hệ thống đang tìm tài xế.
+**Then:** Khách hàng xem được trạng thái đang tìm tài xế.
+
+### AC18 – Theo dõi sau khi ghép tài xế
+
+**Given:** Đã có tài xế nhận chuyến.
+**When:** Khách hàng xem chuyến hiện tại.
+**Then:** Hệ thống hiển thị tài xế nhận chuyến, ETA và trạng thái chuyến hiện tại.
+
+---
+
+# 7. AC – Tính cước
+
+### AC19 – Tính số tiền chuyến
+
+**Given:** Chuyến đã hoàn thành.
+**When:** Hệ thống thực hiện tính cước.
+**Then:** Số tiền phải trả được xác định dựa trên loại dịch vụ và thông tin chuyến.
+
+> **TBD:** công thức tính cước cụ thể chưa được khách hàng cung cấp, nên không nên tự đặt các tiêu chí như giá/km, giá mở cửa hay phụ phí. 
+
+---
+
+# 8. AC – Thanh toán
+
+### AC20 – Thanh toán tiền mặt
+
+**Given:** Chuyến đã hoàn thành và số tiền đã được xác định.
+**When:** Khách hàng chọn thanh toán tiền mặt.
+**Then:** Hệ thống ghi nhận phương thức và kết quả thanh toán theo quy trình nghiệp vụ.
+
+### AC21 – Thanh toán online thành công
+
+**Given:** Khách hàng có số tiền cần thanh toán.
+**When:** Khách hàng chọn thanh toán online và Payment Provider trả về kết quả thành công.
+**Then:** CAB ghi nhận giao dịch thành công và thông báo kết quả cho khách hàng.
+
+### AC22 – Thanh toán online thất bại
+
+**Given:** Khách hàng thực hiện thanh toán online.
+**When:** Payment Provider trả về kết quả thất bại.
+**Then:** CAB ghi nhận kết quả thất bại, thông báo cho khách hàng và cho phép xử lý lại theo chính sách doanh nghiệp.
+
+### AC23 – Bảo mật thanh toán
+
+**Given:** Khách hàng thực hiện thanh toán điện tử.
+**When:** CAB xử lý giao dịch.
+**Then:** CAB không lưu trực tiếp thông tin nhạy cảm của thẻ hoặc tài khoản thanh toán.
+
+Các tiêu chí này bám theo yêu cầu Payment của khách hàng. 
+
+---
+
+# 9. AC – Notification
+
+### AC24 – Thông báo sự kiện chuyến
+
+**Given:** Một sự kiện quan trọng của chuyến xảy ra.
+**When:** CAB ghi nhận sự kiện.
+**Then:** Hệ thống tạo/gửi thông báo đến đối tượng liên quan.
+
+Các sự kiện gồm:
+
+* Yêu cầu đặt xe được tiếp nhận.
+* Tài xế nhận chuyến.
+* Tài xế đến điểm đón.
+* Chuyến hoàn thành.
+* Có kết quả thanh toán.
+
+### AC25 – Thông báo cho tài xế
+
+**Given:** Có yêu cầu chuyến mới hoặc thay đổi liên quan đến chuyến.
+**When:** Sự kiện được CAB ghi nhận.
+**Then:** Tài xế nhận được thông báo tương ứng.
+
+Các thời điểm thông báo này được nêu trực tiếp trong tài liệu. 
+
+---
+
+# 10. AC – Lịch sử và đánh giá
+
+### AC26 – Xem lịch sử chuyến
+
+**Given:** Khách hàng đã đăng nhập.
+**When:** Khách hàng mở lịch sử chuyến.
+**Then:** Hệ thống hiển thị các chuyến trước đó và thông tin liên quan.
+
+### AC27 – Đánh giá tài xế
+
+**Given:** Chuyến đã hoàn thành.
+**When:** Khách hàng gửi đánh giá tài xế hợp lệ.
+**Then:** Hệ thống lưu đánh giá và liên kết đánh giá với chuyến/tài xế tương ứng.
+
+---
+
+# 11. AC – Quản lý vận hành
+
+### AC28 – Quản lý dữ liệu
+
+**Given:** Nhân viên vận hành đã đăng nhập và có quyền.
+**When:** Nhân viên truy cập chức năng quản lý.
+**Then:** Hệ thống cho phép quản lý khách hàng, tài xế, phương tiện và chuyến theo quyền được cấp.
+
+### AC29 – Theo dõi chuyến
+
+**Given:** Có chuyến đang diễn ra.
+**When:** Nhân viên mở chức năng giám sát.
+**Then:** Hệ thống hiển thị chuyến và trạng thái tài xế liên quan.
+
+### AC30 – Tra cứu giao dịch
+
+**Given:** Nhân viên có quyền tra cứu.
+**When:** Nhân viên nhập điều kiện tìm kiếm giao dịch.
+**Then:** Hệ thống trả về các giao dịch phù hợp.
+
+---
+
+# 12. AC – Phân quyền và Audit
+
+### AC31 – Kiểm soát quyền
+
+**Given:** Nhân viên đăng nhập vào CAB System.
+**When:** Nhân viên yêu cầu thực hiện một thao tác quản trị.
+**Then:** Hệ thống kiểm tra quyền trước khi cho phép thao tác.
+
+### AC32 – Không đủ quyền
+
+**Given:** Nhân viên không có quyền đối với một thao tác nhạy cảm.
+**When:** Nhân viên cố thực hiện thao tác.
+**Then:** Hệ thống từ chối thực hiện.
+
+### AC33 – Audit
+
+**Given:** Một thao tác quan trọng được thực hiện.
+**When:** Hệ thống xử lý thao tác thành công hoặc theo quy tắc audit.
+**Then:** Hệ thống lưu thông tin cần thiết để phục vụ kiểm tra khi xảy ra sự cố.
+
+---
+
+# 13. AC – Báo cáo
+
+### AC34 – Xem báo cáo
+
+**Given:** Người dùng có quyền xem báo cáo.
+**When:** Người dùng yêu cầu báo cáo.
+**Then:** Hệ thống tổng hợp và hiển thị dữ liệu tương ứng.
+
+Các báo cáo cần hỗ trợ gồm:
+
+**Số chuyến – Doanh thu – Tỷ lệ hoàn thành – Tỷ lệ hủy – Hiệu quả tài xế.** 
+
+---
+
+# 14. Acceptance Criteria cho Non-Functional Requirements
+
+Không chỉ Functional Requirements, các NFR quan trọng cũng nên có tiêu chí chấp nhận.
+
+| Mã       | Acceptance Criteria                                                                          |
+| -------- | -------------------------------------------------------------------------------------------- |
+| **AC35** | Khi Payment gặp lỗi, chức năng đặt xe cốt lõi vẫn phải tiếp tục hoạt động.                   |
+| **AC36** | Khi Notification gặp lỗi, chức năng đặt xe cốt lõi vẫn phải tiếp tục hoạt động.              |
+| **AC37** | Các thành phần có thể được mở rộng độc lập khi tải của thành phần đó tăng.                   |
+| **AC38** | Có thể triển khai chức năng mới từng phần và hạn chế ảnh hưởng đến chức năng đang hoạt động. |
+| **AC39** | Customer/Driver phải được xác thực trước khi sử dụng chức năng yêu cầu tài khoản.            |
+| **AC40** | Các chức năng quản trị nhạy cảm phải kiểm tra quyền trước khi thực hiện.                     |
+| **AC41** | Dữ liệu cá nhân, phương tiện, vị trí và giao dịch phải được bảo vệ.                          |
+| **AC42** | CAB không lưu trực tiếp thông tin thanh toán nhạy cảm.                                       |
+| **AC43** | Các thao tác quan trọng phải có khả năng truy vết.                                           |
+
+Tài liệu yêu cầu rõ về khả năng mở rộng độc lập, cô lập lỗi, triển khai từng phần và bảo mật. 
+
+# BƯỚC 13: TRUY XUẤT NGUỒN GỐC YÊU CẦU – REQUIREMENT TRACEABILITY
+
+Trong bài CAB System, **truy xuất nguồn gốc yêu cầu (Requirement Traceability)** là việc theo dõi một yêu cầu từ **nguồn gốc ban đầu của khách hàng** cho đến **Business Goal → Business Requirement → Functional Requirement → Use Case → Acceptance Criteria**.
+
+Mục đích là để trả lời các câu hỏi như:
+
+* Yêu cầu này xuất phát từ đâu?
+* Nó phục vụ mục tiêu nghiệp vụ nào?
+* Chức năng nào hiện thực yêu cầu đó?
+* Use Case nào mô tả chức năng?
+* Acceptance Criteria nào dùng để kiểm tra?
+* Nếu khách hàng thay đổi một yêu cầu thì những phần nào bị ảnh hưởng?
+
+## 1. Chuỗi truy xuất nguồn gốc của CAB System
+
+```text
+CUSTOMER REQUIREMENT
+        ↓
+BUSINESS PROBLEM
+        ↓
+BUSINESS GOAL
+        ↓
+BUSINESS REQUIREMENT
+        ↓
+BUSINESS PROCESS
+        ↓
+FUNCTIONAL REQUIREMENT
+        ↓
+BUSINESS RULE / EXCEPTION
+        ↓
+USE CASE
+        ↓
+ACCEPTANCE CRITERIA
+        ↓
+TEST CASE
+```
+
+Ví dụ:
+
+```text
+Hệ thống cũ phân công tài xế thủ công
+            ↓
+Business Problem
+Phân công tài xế chậm, khó mở rộng
+            ↓
+BG02
+Giảm thời gian tìm và phân công tài xế
+            ↓
+BR03 – BR05
+Tự tìm + ưu tiên + tìm lại tài xế
+            ↓
+BP03
+Tìm và phân công tài xế
+            ↓
+FR16 – FR24
+Driver Matching
+            ↓
+UC05
+Tìm và phân công tài xế
+            ↓
+AC07 – AC12
+Tiêu chí chấp nhận matching
+```
+
+Yêu cầu gốc này được tài liệu mô tả rõ: CAB phải tìm tài xế dựa trên vị trí, trạng thái sẵn sàng và tiêu chí vận hành; nếu tài xế không phản hồi hoặc từ chối thì tiếp tục tìm tài xế khác. 
+
+# 2. Traceability Matrix tổng thể
+
+| Nguồn yêu cầu                             | Business Goal                                    | Business Requirement                        | Business Process                 | Functional Requirement | Use Case                           | Acceptance Criteria |
+| ----------------------------------------- | ------------------------------------------------ | ------------------------------------------- | -------------------------------- | ---------------------- | ---------------------------------- | ------------------- |
+| Khách hàng cần tạo yêu cầu đặt xe         | **BG04** Tự động hóa quy trình đặt xe            | **BR02** Tạo yêu cầu đặt xe                 | **BP02** Tạo yêu cầu đặt xe      | **FR06–FR10**          | **UC04 – Đặt xe**                  | **AC05–AC06**       |
+| Phân công tài xế hiện còn thủ công        | **BG02** Giảm thời gian tìm tài xế               | **BR03–BR05** Tự động tìm, ưu tiên, tìm lại | **BP03** Tìm và phân công tài xế | **FR16–FR24**          | **UC05 – Tìm và phân công tài xế** | **AC07–AC12**       |
+| Khách hàng khó theo dõi chuyến            | **BG03** Nâng cao khả năng theo dõi              | **BR06** Theo dõi chuyến                    | **BP04** Thực hiện chuyến        | **FR30–FR32**          | **UC08 – Theo dõi chuyến**         | **AC17–AC18**       |
+| Tài xế cần cập nhật quá trình chuyến      | **BG04/BG06** Chuẩn hóa chuyến và quản lý tài xế | **BR08** Cập nhật trạng thái chuyến         | **BP04** Thực hiện chuyến        | **FR26–FR29**          | **UC07 – Thực hiện chuyến**        | **AC13–AC16**       |
+| Hệ thống phải tính tiền sau chuyến        | **BG04** Tự động hóa quy trình                   | **BR10** Tính tiền chuyến                   | **BP05** Tính cước               | **FR33–FR34**          | **UC09 – Tính cước**               | **AC19**            |
+| Thanh toán chưa được quản lý tập trung    | **BG01** Thanh toán trực tuyến                   | **BR11–BR13** Payment                       | **BP06** Thanh toán              | **FR35–FR41**          | **UC10 – Thanh toán**              | **AC20–AC23**       |
+| Cần thông báo các sự kiện quan trọng      | **BG07** Cải thiện thông báo                     | **BR14** Gửi thông báo                      | **BP07** Notification            | **FR42–FR48**          | **UC11 – Gửi thông báo**           | **AC24–AC25**       |
+| Khách hàng muốn xem lịch sử               | **BG03/BG04** Theo dõi và hoàn thiện quy trình   | **BR15** Lịch sử/đánh giá                   | **BP08** Sau chuyến              | **FR49–FR52**          | **UC12, UC13**                     | **AC26–AC27**       |
+| Doanh nghiệp cần quản lý vận hành         | **BG05/BG08** Quản lý tập trung                  | **BR16–BR17** Quản lý vận hành              | **BP09** Operation               | **FR53–FR60**          | **UC17–UC21**                      | **AC28–AC30**       |
+| Các thao tác quản trị cần kiểm soát quyền | **BG12** Bảo mật                                 | **BR18, BR22** Phân quyền và bảo vệ dữ liệu | Quản trị                         | **FR61–FR63**          | **UC22 – Phân quyền**              | **AC31–AC33**       |
+| Ban lãnh đạo cần số liệu hoạt động        | **BG09** Báo cáo                                 | **BR19** Reporting                          | **BP10** Báo cáo                 | **FR64–FR68**          | **UC23 – Xem báo cáo**             | **AC34**            |
+
+# 3. Truy xuất nguồn gốc chi tiết – Driver Matching
+
+Đây là phần nên dùng làm ví dụ trong báo cáo vì thể hiện rất rõ chuỗi traceability.
+
+### Nguồn yêu cầu
+
+Hệ thống phải tìm tài xế dựa trên vị trí, trạng thái sẵn sàng và tiêu chí vận hành; ưu tiên tài xế phù hợp/gần khách. Nếu tài xế đầu tiên không nhận hoặc không phản hồi, CAB phải tìm tài xế khác mà khách hàng không phải đặt lại. 
+
+### Traceability
+
+| Cấp                        | Mã/Nội dung                                       |
+| -------------------------- | ------------------------------------------------- |
+| **Business Problem**       | Phân công tài xế chủ yếu thực hiện thủ công       |
+| **Business Goal**          | **BG02 – Giảm thời gian tìm và phân công tài xế** |
+| **Business Requirement**   | BR03 – Tự động tìm tài xế                         |
+|                            | BR04 – Ưu tiên tài xế gần/phù hợp                 |
+|                            | BR05 – Tự tìm tài xế khác                         |
+| **Business Process**       | BP03 – Tìm và phân công tài xế                    |
+| **Functional Requirement** | FR16 – Tìm tài xế AVAILABLE                       |
+|                            | FR17 – Lọc tài xế phù hợp                         |
+|                            | FR18 – Ưu tiên tài xế gần                         |
+|                            | FR19 – Gửi yêu cầu                                |
+|                            | FR20 – Chấp nhận chuyến                           |
+|                            | FR21 – Từ chối chuyến                             |
+|                            | FR22 – Xử lý không phản hồi                       |
+|                            | FR23 – Tìm tài xế tiếp theo                       |
+|                            | FR24 – Thông báo không tìm được                   |
+| **Use Case**               | UC05 – Tìm và phân công tài xế                    |
+| **Business Rule**          | BRU03–BRU08                                       |
+| **Exception**              | EX01–EX04                                         |
+| **Acceptance Criteria**    | AC07–AC12                                         |
+
+# 4. Truy xuất nguồn gốc – Payment
+
+Nguồn yêu cầu nói rõ khách có thể thanh toán tiền mặt hoặc điện tử; payment online được xử lý qua nhà cung cấp bên ngoài, CAB không lưu thông tin thanh toán nhạy cảm và phải xử lý trường hợp giao dịch thất bại. 
+
+| Cấp                        | Mã/Nội dung                             |
+| -------------------------- | --------------------------------------- |
+| **Business Problem**       | Thanh toán chưa quản lý tập trung       |
+| **Business Goal**          | **BG01 – Hỗ trợ thanh toán trực tuyến** |
+| **Business Requirement**   | BR10–BR13                               |
+| **Business Process**       | BP05 – Tính cước; BP06 – Thanh toán     |
+| **Functional Requirement** | FR33–FR41                               |
+| **Use Case**               | UC09 – Tính cước; UC10 – Thanh toán     |
+| **Business Rule**          | BRU10–BRU14                             |
+| **Exception**              | EX08–EX10                               |
+| **Acceptance Criteria**    | AC19–AC23                               |
+
+Chuỗi:
+
+```text
+Thanh toán chưa tập trung
+        ↓
+BG01
+Thanh toán online
+        ↓
+BR10 – BR13
+        ↓
+BP05 + BP06
+        ↓
+FR33 – FR41
+        ↓
+UC09 + UC10
+        ↓
+AC19 – AC23
+```
+
+# 5. Truy xuất nguồn gốc – Tracking
+
+| Cấp                        | Nội dung                                  |
+| -------------------------- | ----------------------------------------- |
+| **Nguồn yêu cầu**          | Khách hàng khó theo dõi trạng thái chuyến |
+| **Business Goal**          | BG03 – Nâng cao khả năng theo dõi         |
+| **Business Requirement**   | BR06                                      |
+| **Functional Requirement** | FR30–FR32                                 |
+| **Use Case**               | UC08 – Theo dõi chuyến                    |
+| **Acceptance Criteria**    | AC17–AC18                                 |
+
+Khách hàng cần biết hệ thống đang tìm tài xế, tài xế nào nhận chuyến, thời gian dự kiến đến và trạng thái chuyến hiện tại. 
+
+# 6. Truy xuất nguồn gốc – Notification
+
+```text
+Customer Requirement
+Cần thông báo trạng thái chuyến
+        ↓
+BG07
+Cải thiện việc thông báo
+        ↓
+BR14
+Gửi thông báo sự kiện
+        ↓
+BP07
+Notification Process
+        ↓
+FR42 – FR48
+        ↓
+UC11
+Gửi thông báo
+        ↓
+AC24 – AC25
+```
+
+Các sự kiện gồm nhận yêu cầu đặt xe, có tài xế nhận chuyến, tài xế đến, hoàn thành chuyến và kết quả thanh toán. 
+
+# 7. Truy xuất Non-Functional Requirements
+
+NFR cũng cần traceability.
+
+| Nguồn yêu cầu                                   | NFR                     | AC   |
+| ----------------------------------------------- | ----------------------- | ---- |
+| Payment lỗi không được làm hệ thống đặt xe dừng | NFR05 – Fault Tolerance | AC35 |
+| Notification lỗi không được làm đặt xe dừng     | NFR06 – Fault Tolerance | AC36 |
+| Thành phần phải mở rộng độc lập                 | NFR03 – Scalability     | AC37 |
+| Chức năng mới triển khai từng phần              | NFR07 – Maintainability | AC38 |
+| Customer/Driver phải xác thực                   | NFR11 – Security        | AC39 |
+| Quản trị phải kiểm soát quyền                   | NFR12 – Authorization   | AC40 |
+| Dữ liệu phải được bảo vệ                        | NFR13–NFR15             | AC41 |
+| Không lưu thông tin payment nhạy cảm            | NFR16                   | AC42 |
+| Lưu vết thao tác quan trọng                     | NFR17 – Auditability    | AC43 |
+
+Các yêu cầu này xuất phát trực tiếp từ phần ổn định, khả năng mở rộng và bảo mật của tài liệu. 
+
+# 8. Truy xuất ngược
+
+Traceability không chỉ đi từ trên xuống mà còn phải **truy ngược**.
+
+Ví dụ giáo viên hỏi:
+
+> **“UC10 – Thanh toán được tạo ra từ yêu cầu nào?”**
+
+Ta truy ngược:
+
+```text
+UC10 – Thanh toán
+        ↑
+FR35 – FR41
+        ↑
+BR11 – BR13
+        ↑
+BG01
+        ↑
+Business Problem:
+Thanh toán chưa quản lý tập trung
+        ↑
+Customer Requirement
+```
+
+Hoặc:
+
+> **“AC10 – Nếu tài xế từ chối thì tìm người khác có căn cứ ở đâu?”**
+
+```text
+AC10
+    ↑
+UC05
+    ↑
+FR21 + FR23
+    ↑
+BR05
+    ↑
+BG02
+    ↑
+Customer Requirement:
+Tài xế từ chối → tiếp tục tìm tài xế khác
+```
+
+Và yêu cầu nguồn xác nhận đúng hành vi này. 
+
+## 9. Những yêu cầu chưa thể trace đến thiết kế cuối cùng
+
+Các nội dung sau phải đánh dấu **TBD**, vì nguồn chưa đủ thông tin:
+
+| ID        | Nội dung                         |
+| --------- | -------------------------------- |
+| **TBD01** | Công thức tính cước              |
+| **TBD02** | Tiêu chí ưu tiên tài xế chi tiết |
+| **TBD03** | Thời gian tài xế phải phản hồi   |
+| **TBD04** | Chính sách hủy chuyến            |
+| **TBD05** | Xử lý mất kết nối                |
+| **TBD06** | Thời gian lưu dữ liệu            |
+
+Tài liệu yêu cầu BA làm rõ chính các vấn đề này trước khi nhóm phát triển xây dựng giải pháp. 
+
