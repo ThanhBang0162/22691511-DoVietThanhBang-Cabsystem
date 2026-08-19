@@ -130,11 +130,7 @@ MỨC ĐỘ           │                     │ ★ Nhân viên vận hành   
 
 **Lưu ý:** mức Power/Interest ở bảng trên là **đánh giá phân tích** dựa trên vai trò được mô tả trong tài liệu, chứ tài liệu không trực tiếp gán các mức “Cao/Thấp”. Ví dụ, tài liệu xác định BA có trách nhiệm làm rõ các vấn đề chưa chốt trước khi nhóm phát triển xây dựng giải pháp. 
 ## 3. Ý nghĩa 4 vùng của Stakeholder Matrix
-
 **Manage Closely – Quản lý chặt chẽ:** Ban lãnh đạo, BA và nhân viên vận hành cần được tham gia thường xuyên vào quá trình phân tích yêu cầu, xác nhận nghiệp vụ và các quyết định quan trọng.
-
 **Keep Satisfied – Duy trì sự hài lòng:** Payment Provider cần được quản lý tốt về yêu cầu tích hợp, bảo mật và xử lý giao dịch.
-
 **Keep Informed – Cập nhật thông tin:** Khách hàng, tài xế và Development Team cần được cung cấp đầy đủ thông tin liên quan đến yêu cầu, thay đổi và hoạt động của hệ thống.
-
 **Monitor – Theo dõi:** Notification Provider cần được theo dõi nhưng mức độ tham gia vào quyết định nghiệp vụ cốt lõi thấp hơn. CAB System cũng được yêu cầu có khả năng mở rộng thêm các kênh thông báo mà không phải thay đổi toàn bộ hệ thống. 
