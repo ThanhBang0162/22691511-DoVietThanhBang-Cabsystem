@@ -1143,3 +1143,999 @@ FR39: Ghi nhận giao dịch
 FR40: Thông báo thất bại
 FR41: Xử lý lại thanh toán
 
+# BƯỚC 8: XÁC ĐỊNH BUSINESS RULE VÀ NGOẠI LỆ
+
+Dựa trên **Customer-Requirement.docx**, sau khi phân rã Functional Requirements, ta cần xác định **Business Rule (quy tắc nghiệp vụ)** và **Exception (ngoại lệ)**.
+
+> **Business Rule:** Quy định/điều kiện mà nghiệp vụ CAB phải tuân theo.
+> **Exception:** Tình huống bất thường hoặc thất bại có thể xảy ra trong quá trình thực hiện nghiệp vụ.
+
+---
+
+## 1. Business Rules của CAB System
+
+| Mã        | Business Rule                                                                                                                             | Liên quan        |
+| --------- | ----------------------------------------------------------------------------------------------------------------------------------------- | ---------------- |
+| **BRU01** | Khách hàng và tài xế phải được **xác thực** trước khi sử dụng các chức năng yêu cầu tài khoản.                                            | Tài khoản        |
+| **BRU02** | Một yêu cầu đặt xe phải có **điểm đón, điểm đến và loại xe** trước khi được gửi.                                                          | Đặt xe           |
+| **BRU03** | Chỉ tài xế ở trạng thái **sẵn sàng nhận chuyến** mới được xem xét để phân công chuyến.                                                    | Matching         |
+| **BRU04** | Việc tìm tài xế phải dựa trên **vị trí, trạng thái sẵn sàng và các tiêu chí vận hành khác**.                                              | Matching         |
+| **BRU05** | Hệ thống phải **ưu tiên tài xế phù hợp và gần khách hàng**.                                                                               | Matching         |
+| **BRU06** | Nếu tài xế được đề xuất **từ chối hoặc không phản hồi**, hệ thống phải tiếp tục tìm tài xế khác.                                          | Matching         |
+| **BRU07** | Khách hàng **không phải tạo lại yêu cầu đặt xe** khi tài xế đầu tiên từ chối hoặc không phản hồi.                                         | Matching         |
+| **BRU08** | Nếu không tìm được tài xế phù hợp, hệ thống phải **thông báo rõ ràng cho khách hàng**.                                                    | Matching         |
+| **BRU09** | Tài xế phải cập nhật trạng thái chuyến theo quá trình thực hiện: **đã đến điểm đón → đã đón khách → đang di chuyển → hoàn thành chuyến**. | Trip             |
+| **BRU10** | Số tiền phải trả được xác định **sau khi chuyến hoàn thành**, dựa trên loại dịch vụ và thông tin chuyến đi.                               | Fare             |
+| **BRU11** | Khách hàng có thể thanh toán bằng **tiền mặt hoặc thanh toán điện tử**.                                                                   | Payment          |
+| **BRU12** | Thanh toán điện tử phải được thực hiện thông qua **nhà cung cấp thanh toán bên ngoài**.                                                   | Payment          |
+| **BRU13** | CAB System **không được lưu trực tiếp thông tin nhạy cảm của thẻ hoặc tài khoản thanh toán**.                                             | Payment/Security |
+| **BRU14** | Nếu thanh toán điện tử thất bại, hệ thống phải thông báo và cho phép **xử lý lại theo chính sách doanh nghiệp**.                          | Payment          |
+| **BRU15** | Khách hàng chỉ thực hiện **đánh giá tài xế sau khi chuyến hoàn thành**.                                                                   | Rating           |
+| **BRU16** | Các chức năng quản trị nhạy cảm phải được **kiểm soát quyền truy cập**.                                                                   | Authorization    |
+| **BRU17** | Nhân viên thông thường không được thực hiện các **thao tác quản trị nhạy cảm** nếu không có quyền.                                        | Authorization    |
+| **BRU18** | Các thao tác quan trọng phải được **lưu vết** để phục vụ kiểm tra khi có sự cố.                                                           | Audit            |
+
+Các quy tắc matching như trạng thái sẵn sàng, vị trí, ưu tiên tài xế gần và tự tìm người khác khi từ chối được nêu trực tiếp trong yêu cầu.  Quy tắc thanh toán và bảo vệ thông tin nhạy cảm cũng được khách hàng nêu rõ. 
+
+---
+
+# 2. Business Rules chưa được khách hàng chốt
+
+Phần này **rất quan trọng khi làm BA**. Không được tự đặt quy tắc nếu khách hàng chưa cung cấp.
+
+| Mã        | Business Rule cần làm rõ  | Câu hỏi cần xác nhận                                       |
+| --------- | ------------------------- | ---------------------------------------------------------- |
+| **TBD01** | Cách tính cước            | Giá mở cửa? Giá/km? Giá theo thời gian? Phụ phí?           |
+| **TBD02** | Tiêu chí ưu tiên tài xế   | Chỉ khoảng cách hay thêm rating, tỷ lệ nhận chuyến...?     |
+| **TBD03** | Thời gian tài xế phản hồi | Tài xế có bao nhiêu giây/phút để nhận chuyến?              |
+| **TBD04** | Chính sách hủy chuyến     | Ai được hủy? Khi nào? Có phí hủy không?                    |
+| **TBD05** | Xử lý mất kết nối         | Mất mạng khi đang nhận/thực hiện chuyến thì xử lý thế nào? |
+| **TBD06** | Thời gian lưu dữ liệu     | Lịch sử chuyến, vị trí, giao dịch, audit log lưu bao lâu?  |
+
+Đây chính xác là những vấn đề tài liệu yêu cầu BA phải làm rõ với stakeholder trước khi Development Team xây dựng giải pháp. 
+
+---
+
+# 3. Ngoại lệ – Exceptions
+
+## Nhóm 1 – Đặt xe & tìm tài xế
+
+| Mã       | Ngoại lệ                      | Cách xử lý                                                                                                |
+| -------- | ----------------------------- | --------------------------------------------------------------------------------------------------------- |
+| **EX01** | Không có tài xế phù hợp       | Thông báo cho khách hàng không tìm được tài xế.                                                           |
+| **EX02** | Tài xế từ chối chuyến         | Tự động tìm tài xế tiếp theo.                                                                             |
+| **EX03** | Tài xế không phản hồi         | Sau thời gian phản hồi quy định, chuyển sang tài xế khác. **Thời gian cụ thể chưa được khách hàng chốt.** |
+| **EX04** | Nhiều tài xế lần lượt từ chối | Tiếp tục tìm cho đến khi có tài xế nhận hoặc không còn tài xế phù hợp.                                    |
+
+EX01–EX04 xuất phát trực tiếp từ yêu cầu matching. 
+## Nhóm 2 – Chuyến đi
+
+| Mã       | Ngoại lệ                      | Cách xử lý                                                                       |
+| -------- | ----------------------------- | -------------------------------------------------------------------------------- |
+| **EX05** | Mất kết nối mạng trong chuyến | **Chưa xác định – cần BA xác nhận với khách hàng.**                              |
+| **EX06** | Khách hàng hủy chuyến         | **Chưa xác định chính sách hủy – cần xác nhận.**                                 |
+| **EX07** | Tài xế hủy chuyến             | **Chưa xác định – cần làm rõ quy trình tìm lại tài xế và chính sách liên quan.** |
+
+Ở đây không nên tự viết rằng hệ thống chắc chắn sẽ ghép tài xế mới hay phạt tài xế, vì tài liệu nói rõ **chính sách hủy và xử lý mất kết nối chưa được chốt**. 
+
+---
+
+# 4. Ngoại lệ thanh toán
+
+| Mã       | Ngoại lệ                    | Cách xử lý                                                               |
+| -------- | --------------------------- | ------------------------------------------------------------------------ |
+| **EX08** | Thanh toán điện tử thất bại | Thông báo cho khách hàng.                                                |
+| **EX09** | Giao dịch cần thực hiện lại | Cho phép xử lý lại theo chính sách doanh nghiệp.                         |
+| **EX10** | Payment Provider gặp lỗi    | CAB cần hạn chế lỗi Payment làm toàn bộ hệ thống đặt xe ngừng hoạt động. |
+
+EX08 và EX09 được yêu cầu trực tiếp trong phần Payment.  Đồng thời khách hàng yêu cầu lỗi thanh toán không được làm toàn bộ CAB System ngừng hoạt động. 
+# 5. Ngoại lệ Notification
+| Mã       | Ngoại lệ                  | Cách xử lý                                                      |
+| -------- | ------------------------- | --------------------------------------------------------------- |
+| **EX11** | Dịch vụ thông báo gặp lỗi | Không được làm chức năng đặt xe ngừng hoạt động.                |
+| **EX12** | Không gửi được thông báo  | Cơ chế retry/fallback cụ thể **chưa được khách hàng xác định**. |
+
+Khách hàng yêu cầu Payment hoặc Notification gặp lỗi không được làm toàn bộ hệ thống đặt xe dừng. 
+# 6. Ngoại lệ về quyền truy cập
+
+| Mã       | Ngoại lệ                                                      | Cách xử lý                              |
+| -------- | ------------------------------------------------------------- | --------------------------------------- |
+| **EX13** | Người dùng chưa xác thực truy cập chức năng yêu cầu tài khoản | Từ chối truy cập/yêu cầu xác thực.      |
+| **EX14** | Nhân viên không đủ quyền thực hiện thao tác nhạy cảm          | Không cho phép thực hiện thao tác.      |
+| **EX15** | Có thao tác quan trọng hoặc bất thường                        | Ghi nhận audit log để phục vụ kiểm tra. |
+
+Các yêu cầu về xác thực, phân quyền, bảo vệ dữ liệu và audit được nêu trong tài liệu. 
+# 7. Liên kết Business Rule với Functional Requirement
+Ví dụ phần **Driver Matching**:
+
+```text id="1vbwji"
+BG02
+Giảm thời gian tìm tài xế
+        ↓
+BR03 – BR05
+Business Requirements
+        ↓
+FR16 – FR24
+Functional Requirements
+        ↓
+BUSINESS RULES
+BRU03: Tài xế phải AVAILABLE
+BRU04: Dựa trên vị trí + trạng thái + tiêu chí
+BRU05: Ưu tiên tài xế gần/phù hợp
+BRU06: Từ chối → tìm người khác
+BRU07: Khách không cần đặt lại
+        ↓
+EXCEPTIONS
+EX01: Không tìm được tài xế
+EX02: Tài xế từ chối
+EX03: Tài xế không phản hồi
+```
+
+Phần **Payment**:
+BG01
+Thanh toán online
+        ↓
+BR10 – BR13
+Business Requirements
+        ↓
+FR33 – FR41
+Functional Requirements
+        ↓
+BUSINESS RULES
+BRU10: Tính tiền sau khi hoàn thành
+BRU11: Tiền mặt / Online
+BRU12: Online qua Payment Provider
+BRU13: Không lưu dữ liệu thanh toán nhạy cảm
+        ↓
+EXCEPTIONS
+EX08: Thanh toán thất bại
+EX09: Xử lý lại giao dịch
+EX10: Payment Provider gặp lỗi
+
+# BƯỚC 9: MÔ HÌNH HÓA DỮ LIỆU – DATA MODELING
+
+Dựa trên yêu cầu CAB System, mô hình dữ liệu nên tập trung vào các thực thể nghiệp vụ chính: **Khách hàng, Tài xế, Phương tiện, Chuyến đi, Thanh toán, Đánh giá, Vị trí, Thông báo và Nhân viên vận hành**. Những thực thể này được suy ra trực tiếp từ các nhóm dữ liệu mà hệ thống cần quản lý trong tài liệu.  
+
+## 1. Các thực thể chính
+
+| Thực thể              | Ý nghĩa                                         |
+| --------------------- | ----------------------------------------------- |
+| **Customer**          | Lưu thông tin khách hàng                        |
+| **Driver**            | Lưu thông tin tài xế                            |
+| **Vehicle**           | Lưu thông tin phương tiện của tài xế            |
+| **Trip**              | Lưu thông tin chuyến đi                         |
+| **TripRequest**       | Lưu yêu cầu đặt xe ban đầu                      |
+| **DriverAssignment**  | Lưu quá trình hệ thống đề xuất/phân công tài xế |
+| **DriverLocation**    | Lưu vị trí tài xế                               |
+| **Payment**           | Lưu thông tin thanh toán                        |
+| **Rating**            | Lưu đánh giá tài xế sau chuyến                  |
+| **Notification**      | Lưu thông báo gửi cho người dùng                |
+| **OperationStaff**    | Lưu thông tin nhân viên vận hành                |
+| **Role / Permission** | Phục vụ phân quyền                              |
+| **AuditLog**          | Lưu vết các thao tác quan trọng                 |
+
+---
+
+# 2. Phân tích dữ liệu từng thực thể
+
+## Customer
+
+| Thuộc tính   | Ý nghĩa              |
+| ------------ | -------------------- |
+| CustomerID   | Mã khách hàng        |
+| FullName     | Họ tên               |
+| Phone        | Số điện thoại        |
+| Email        | Email                |
+| PasswordHash | Thông tin xác thực   |
+| Status       | Trạng thái tài khoản |
+| CreatedAt    | Ngày tạo             |
+
+Khách hàng cần đăng ký, đăng nhập và cập nhật thông tin cá nhân. 
+
+---
+
+## Driver
+
+| Thuộc tính         | Ý nghĩa                   |
+| ------------------ | ------------------------- |
+| DriverID           | Mã tài xế                 |
+| FullName           | Họ tên                    |
+| Phone              | Số điện thoại             |
+| Email              | Email                     |
+| Status             | Trạng thái tài khoản      |
+| AvailabilityStatus | Sẵn sàng / không sẵn sàng |
+| RatingAverage      | Điểm đánh giá trung bình  |
+| CreatedAt          | Ngày tạo                  |
+
+Tài xế cần có hồ sơ và trạng thái hoạt động để hỗ trợ việc tìm tài xế. 
+
+---
+
+## Vehicle
+
+| Thuộc tính   | Ý nghĩa               |
+| ------------ | --------------------- |
+| VehicleID    | Mã phương tiện        |
+| DriverID     | Tài xế sở hữu/sử dụng |
+| VehicleType  | Loại xe               |
+| LicensePlate | Biển số               |
+| Brand        | Hãng xe               |
+| Model        | Mẫu xe                |
+| Status       | Trạng thái            |
+
+Quan hệ chính:
+
+```text
+Driver 1 ----- N Vehicle
+```
+
+Một tài xế có thể có một hoặc nhiều thông tin phương tiện theo thiết kế dữ liệu, nhưng số lượng thực tế cần BA xác nhận nếu nghiệp vụ yêu cầu giới hạn.
+
+---
+
+# 3. TripRequest – Yêu cầu đặt xe
+
+Tách `TripRequest` khỏi `Trip` giúp mô hình đúng hơn vì có trường hợp **khách tạo yêu cầu nhưng không tìm được tài xế**, khi đó chưa chắc đã hình thành chuyến thực tế.
+
+| Thuộc tính     | Ý nghĩa            |
+| -------------- | ------------------ |
+| RequestID      | Mã yêu cầu         |
+| CustomerID     | Khách hàng yêu cầu |
+| PickupLocation | Điểm đón           |
+| Destination    | Điểm đến           |
+| VehicleType    | Loại xe yêu cầu    |
+| RequestStatus  | Trạng thái yêu cầu |
+| RequestedAt    | Thời gian yêu cầu  |
+
+Trạng thái có thể mô hình hóa ở mức khái niệm như:
+
+```text
+Searching
+Matched
+NoDriverFound
+Cancelled
+Tuy nhiên chính sách hủy vẫn chưa được khách hàng chốt nên chi tiết `Cancelled` cần xác nhận thêm. 
+# 4. DriverAssignment – Phân công tài xế
+
+Đây là thực thể rất quan trọng cho CAB System vì một yêu cầu có thể được gửi lần lượt cho nhiều tài xế.
+
+| Thuộc tính     | Ý nghĩa                           |
+| -------------- | --------------------------------- |
+| AssignmentID   | Mã phân công                      |
+| RequestID      | Yêu cầu đặt xe                    |
+| DriverID       | Tài xế được đề xuất               |
+| OfferedAt      | Thời điểm gửi yêu cầu             |
+| ResponseStatus | Accepted / Rejected / No Response |
+| RespondedAt    | Thời điểm phản hồi                |
+
+Quan hệ:
+
+```text
+TripRequest 1 ------ N DriverAssignment
+Driver      1 ------ N DriverAssignment
+```
+
+Ví dụ:
+
+```text
+Request R001
+   │
+   ├── Driver D01 → Rejected
+   ├── Driver D02 → No Response
+   └── Driver D03 → Accepted
+```
+
+Cách mô hình này phản ánh đúng yêu cầu: nếu tài xế đầu tiên không nhận, hệ thống tiếp tục tìm tài xế khác mà khách hàng không phải tạo lại yêu cầu. 
+
+---
+
+# 5. Trip – Chuyến đi
+
+| Thuộc tính           | Ý nghĩa            |
+| -------------------- | ------------------ |
+| TripID               | Mã chuyến          |
+| RequestID            | Yêu cầu đặt xe     |
+| CustomerID           | Khách hàng         |
+| DriverID             | Tài xế             |
+| VehicleID            | Phương tiện        |
+| PickupLocation       | Điểm đón           |
+| Destination          | Điểm đến           |
+| TripStatus           | Trạng thái chuyến  |
+| StartTime            | Thời gian bắt đầu  |
+| EndTime              | Thời gian kết thúc |
+| EstimatedArrivalTime | ETA                |
+| FareAmount           | Số tiền chuyến     |
+
+Trạng thái chuyến dựa trên yêu cầu:
+
+```text
+DriverAssigned
+      ↓
+DriverArrived
+      ↓
+PassengerPickedUp
+      ↓
+InProgress
+      ↓
+Completed
+```
+Đây là các trạng thái tài xế cần cập nhật trong quá trình thực hiện chuyến. 
+---
+
+# 6. DriverLocation – Vị trí tài xế
+
+| Thuộc tính | Ý nghĩa            |
+| ---------- | ------------------ |
+| LocationID | Mã bản ghi         |
+| DriverID   | Tài xế             |
+| Latitude   | Vĩ độ              |
+| Longitude  | Kinh độ            |
+| RecordedAt | Thời gian ghi nhận |
+
+Quan hệ:
+
+```text
+Driver 1 ----- N DriverLocation
+```
+
+CAB cần lưu vị trí tài xế để hỗ trợ tìm tài xế gần khách và cải thiện dự kiến thời gian đến. 
+
+---
+
+# 7. Payment
+
+| Thuộc tính        | Ý nghĩa                    |
+| ----------------- | -------------------------- |
+| PaymentID         | Mã thanh toán              |
+| TripID            | Chuyến đi                  |
+| Amount            | Số tiền                    |
+| PaymentMethod     | Cash / Online              |
+| PaymentStatus     | Pending / Success / Failed |
+| ProviderReference | Mã giao dịch của provider  |
+| PaidAt            | Thời gian thanh toán       |
+
+Quan hệ:
+
+```text
+Trip 1 ----- 0..N Payment
+```
+
+Tôi đề xuất `0..N` thay vì cứng `1:1` vì tài liệu cho phép thanh toán điện tử thất bại và xử lý lại, nên về mặt dữ liệu có thể có nhiều lần thử thanh toán cho cùng một chuyến. Đây là một suy luận mô hình hóa từ yêu cầu retry, không phải cardinality được tài liệu ghi trực tiếp. 
+
+Thông tin thẻ/tài khoản nhạy cảm **không nên nằm trong Payment** vì CAB không được lưu trực tiếp các dữ liệu đó. 
+
+---
+
+# 8. Rating
+
+| Thuộc tính | Ý nghĩa           |
+| ---------- | ----------------- |
+| RatingID   | Mã đánh giá       |
+| TripID     | Chuyến            |
+| CustomerID | Khách hàng        |
+| DriverID   | Tài xế            |
+| Score      | Điểm đánh giá     |
+| Comment    | Nội dung đánh giá |
+| CreatedAt  | Thời gian         |
+
+Quan hệ:
+
+```text
+Trip     1 ----- 0..1 Rating
+Customer 1 ----- N Rating
+Driver   1 ----- N Rating
+```
+
+Khách hàng đánh giá tài xế sau khi chuyến hoàn thành. 
+
+---
+
+# 9. Notification
+
+| Thuộc tính       | Ý nghĩa           |
+| ---------------- | ----------------- |
+| NotificationID   | Mã thông báo      |
+| RecipientID      | Người nhận        |
+| RecipientType    | Customer / Driver |
+| TripID           | Chuyến liên quan  |
+| NotificationType | Loại thông báo    |
+| Content          | Nội dung          |
+| Status           | Sent / Failed     |
+| CreatedAt        | Thời gian         |
+
+Ví dụ loại thông báo:
+
+```text
+BookingReceived
+DriverAssigned
+DriverArrived
+TripCompleted
+PaymentResult
+NewTripRequest
+```
+
+Các sự kiện này bám theo yêu cầu notification trong tài liệu. 
+
+---
+
+# 10. OperationStaff, Role và Permission
+
+```text
+OperationStaff
+      │
+      N
+      │
+      1
+     Role
+      │
+      N
+      │
+      N
+ Permission
+```
+
+Có thể triển khai bằng bảng trung gian:
+
+```text
+RolePermission
+```
+
+Các thực thể đề xuất:
+
+### OperationStaff
+
+```text
+StaffID
+FullName
+Email
+PasswordHash
+RoleID
+Status
+```
+
+### Role
+
+```text
+RoleID
+RoleName
+```
+
+### Permission
+
+```text
+PermissionID
+PermissionName
+```
+
+### RolePermission
+
+```text
+RoleID
+PermissionID
+```
+
+Điều này hỗ trợ yêu cầu một số chức năng quản trị phải được phân quyền và nhân viên thông thường không được thao tác nhạy cảm. 
+
+---
+
+# 11. AuditLog
+
+| Thuộc tính | Ý nghĩa                   |
+| ---------- | ------------------------- |
+| AuditID    | Mã log                    |
+| UserID     | Người thực hiện           |
+| UserType   | Driver / Customer / Staff |
+| Action     | Thao tác                  |
+| EntityType | Đối tượng bị tác động     |
+| EntityID   | ID đối tượng              |
+| Timestamp  | Thời gian                 |
+| Details    | Chi tiết                  |
+
+CAB cần lưu vết các thao tác quan trọng để phục vụ kiểm tra khi có sự cố. 
+
+# 12. ERD tổng thể bằng Mermaid
+
+Bạn có thể copy đoạn này vào Markdown hỗ trợ Mermaid:
+
+```mermaid
+erDiagram
+
+    CUSTOMER ||--o{ TRIP_REQUEST : creates
+    CUSTOMER ||--o{ TRIP : takes
+    CUSTOMER ||--o{ RATING : gives
+
+    DRIVER ||--o{ VEHICLE : owns
+    DRIVER ||--o{ DRIVER_LOCATION : has
+    DRIVER ||--o{ DRIVER_ASSIGNMENT : receives
+    DRIVER ||--o{ TRIP : performs
+    DRIVER ||--o{ RATING : receives
+
+    TRIP_REQUEST ||--o{ DRIVER_ASSIGNMENT : generates
+    TRIP_REQUEST ||--o| TRIP : becomes
+
+    VEHICLE ||--o{ TRIP : used_for
+
+    TRIP ||--o{ PAYMENT : has
+    TRIP ||--o| RATING : has
+    TRIP ||--o{ NOTIFICATION : generates
+
+    OPERATION_STAFF }o--|| ROLE : assigned
+    ROLE ||--o{ ROLE_PERMISSION : has
+    PERMISSION ||--o{ ROLE_PERMISSION : included_in
+
+    CUSTOMER {
+        int CustomerID PK
+        string FullName
+        string Phone
+        string Email
+        string PasswordHash
+        string Status
+        datetime CreatedAt
+    }
+
+    DRIVER {
+        int DriverID PK
+        string FullName
+        string Phone
+        string Email
+        string Status
+        string AvailabilityStatus
+        decimal RatingAverage
+    }
+
+    VEHICLE {
+        int VehicleID PK
+        int DriverID FK
+        string VehicleType
+        string LicensePlate
+        string Brand
+        string Model
+        string Status
+    }
+
+    TRIP_REQUEST {
+        int RequestID PK
+        int CustomerID FK
+        string PickupLocation
+        string Destination
+        string VehicleType
+        string RequestStatus
+        datetime RequestedAt
+    }
+
+    DRIVER_ASSIGNMENT {
+        int AssignmentID PK
+        int RequestID FK
+        int DriverID FK
+        string ResponseStatus
+        datetime OfferedAt
+        datetime RespondedAt
+    }
+
+    DRIVER_LOCATION {
+        int LocationID PK
+        int DriverID FK
+        decimal Latitude
+        decimal Longitude
+        datetime RecordedAt
+    }
+
+    TRIP {
+        int TripID PK
+        int RequestID FK
+        int CustomerID FK
+        int DriverID FK
+        int VehicleID FK
+        string TripStatus
+        datetime StartTime
+        datetime EndTime
+        decimal FareAmount
+    }
+
+    PAYMENT {
+        int PaymentID PK
+        int TripID FK
+        decimal Amount
+        string PaymentMethod
+        string PaymentStatus
+        string ProviderReference
+        datetime PaidAt
+    }
+
+    RATING {
+        int RatingID PK
+        int TripID FK
+        int CustomerID FK
+        int DriverID FK
+        int Score
+        string Comment
+    }
+
+    NOTIFICATION {
+        int NotificationID PK
+        int TripID FK
+        string RecipientType
+        int RecipientID
+        string NotificationType
+        string Status
+    }
+
+    OPERATION_STAFF {
+        int StaffID PK
+        int RoleID FK
+        string FullName
+        string Email
+        string Status
+    }
+
+    ROLE {
+        int RoleID PK
+        string RoleName
+    }
+
+    PERMISSION {
+        int PermissionID PK
+        string PermissionName
+    }
+
+    ROLE_PERMISSION {
+        int RoleID FK
+        int PermissionID FK
+    }
+```
+
+## 13. Những dữ liệu chưa nên chốt cứng
+
+Theo tài liệu, một số thông tin vẫn cần BA làm rõ trước khi thiết kế database chi tiết:
+
+* **Công thức tính cước** → chưa xác định đầy đủ dữ liệu đầu vào cần lưu.
+* **Tiêu chí ưu tiên tài xế** → chưa rõ có cần rating, tỷ lệ nhận chuyến, loại tài xế...
+* **Thời gian phản hồi tài xế** → chưa chốt timeout.
+* **Chính sách hủy chuyến** → chưa rõ cần lưu phí hủy/lý do hủy đến mức nào.
+* **Xử lý mất kết nối** → chưa chốt cơ chế đồng bộ dữ liệu.
+* **Thời gian lưu dữ liệu** → chưa xác định retention cho location, trip, payment và audit. 
+
+Vì vậy mô hình trên nên xem là **Conceptual/Logical Data Model ban đầu**, chưa phải database schema cuối cùng.
+
+Chuỗi phân tích của bài hiện tại sẽ là:
+
+```text
+Business Context
+        ↓
+Stakeholders
+        ↓
+Business Goals
+        ↓
+Scope
+        ↓
+Business Requirements
+        ↓
+Business Process
+        ↓
+Functional Requirements
+        ↓
+Business Rules + Exceptions
+        ↓
+DATA MODEL
+        ↓
+System Capabilities
+        ↓
+Services / Components
+```
+# BƯỚC 10: XÁC ĐỊNH YÊU CẦU NON-FUNCTIONAL
+
+**Non-Functional Requirement (NFR)** là các yêu cầu mô tả **hệ thống phải hoạt động như thế nào**, thay vì mô tả hệ thống thực hiện chức năng gì.
+
+Với CAB System, tài liệu khách hàng nêu khá rõ các nhóm yêu cầu về **hiệu năng, khả năng mở rộng, tính sẵn sàng, khả năng chịu lỗi, bảo mật, khả năng bảo trì/mở rộng và audit**. 
+
+## 1. Bảng Non-Functional Requirements
+
+| Mã        | Nhóm NFR         | Yêu cầu Non-Functional                                                                                                     |
+| --------- | ---------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| **NFR01** | Performance      | Hệ thống phải hoạt động ổn định trong các thời điểm có nhu cầu đặt xe tăng cao.                                            |
+| **NFR02** | Scalability      | Hệ thống phải có khả năng phục vụ số lượng lớn khách hàng và tài xế.                                                       |
+| **NFR03** | Scalability      | Các thành phần của hệ thống phải có khả năng **mở rộng độc lập** khi tải tăng.                                             |
+| **NFR04** | Availability     | Hệ thống đặt xe phải duy trì hoạt động ngay cả khi một số chức năng phụ gặp sự cố.                                         |
+| **NFR05** | Fault Tolerance  | Lỗi ở chức năng **thanh toán** không được làm toàn bộ hệ thống đặt xe ngừng hoạt động.                                     |
+| **NFR06** | Fault Tolerance  | Lỗi ở chức năng **thông báo** không được làm toàn bộ hệ thống đặt xe ngừng hoạt động.                                      |
+| **NFR07** | Maintainability  | Các chức năng mới phải có khả năng được triển khai từng phần và hạn chế ảnh hưởng đến các chức năng đang hoạt động.        |
+| **NFR08** | Extensibility    | Hệ thống phải dễ dàng bổ sung các loại dịch vụ mới trong tương lai.                                                        |
+| **NFR09** | Extensibility    | Hệ thống phải hỗ trợ bổ sung phương thức thanh toán hoặc Payment Provider mới mà không phải xây dựng lại toàn bộ hệ thống. |
+| **NFR10** | Extensibility    | Hệ thống phải hỗ trợ thêm nhà cung cấp hoặc kênh thông báo mới mà không phải thay đổi toàn bộ hệ thống.                    |
+| **NFR11** | Security         | Khách hàng và tài xế phải được xác thực trước khi truy cập các chức năng yêu cầu tài khoản.                                |
+| **NFR12** | Authorization    | Các chức năng quản trị phải được kiểm soát quyền truy cập.                                                                 |
+| **NFR13** | Data Security    | Thông tin cá nhân của người dùng phải được bảo vệ.                                                                         |
+| **NFR14** | Data Security    | Thông tin phương tiện và dữ liệu vị trí tài xế phải được bảo vệ.                                                           |
+| **NFR15** | Data Security    | Dữ liệu giao dịch phải được bảo vệ.                                                                                        |
+| **NFR16** | Payment Security | CAB System không được lưu trực tiếp thông tin nhạy cảm của thẻ hoặc tài khoản thanh toán.                                  |
+| **NFR17** | Auditability     | Hệ thống phải lưu vết các thao tác quan trọng để phục vụ kiểm tra khi có sự cố.                                            |
+| **NFR18** | Modularity       | Kiến trúc phải đủ linh hoạt để có thể thay đổi một số thành phần kỹ thuật mà không phải xây dựng lại toàn bộ ứng dụng.     |
+
+Các NFR01–NFR10 xuất phát chủ yếu từ yêu cầu hệ thống hoạt động ổn định khi tải cao, các thành phần mở rộng độc lập, cô lập lỗi và triển khai chức năng mới từng phần.  Các NFR về xác thực, phân quyền, bảo vệ dữ liệu và lưu vết được nêu ở phần bảo mật. 
+
+---
+
+## 2. Phân nhóm Non-Functional Requirements
+
+### A. Performance – Hiệu năng
+
+**NFR01:** Hệ thống phải hoạt động ổn định tại các thời điểm nhu cầu đặt xe tăng cao.
+
+Ý nghĩa:
+
+```text
+Nhiều khách hàng đặt xe cùng lúc
+              ↓
+CAB System vẫn phải hoạt động ổn định
+              ↓
+Không để toàn hệ thống bị quá tải
+```
+
+Tài liệu **chưa cung cấp con số cụ thể** như thời gian phản hồi dưới 2 giây hay bao nhiêu request/giây, nên không nên tự thêm KPI này vào yêu cầu chính thức. 
+
+---
+
+## 3. Scalability – Khả năng mở rộng
+
+**NFR02:** CAB System phải hỗ trợ số lượng lớn khách hàng và tài xế.
+
+**NFR03:** Các thành phần phải có khả năng mở rộng độc lập.
+
+Ví dụ:
+
+```text
+Booking Service      tải cao
+       ↓
+Chỉ scale Booking Service
+
+Matching Service     tải cao
+       ↓
+Chỉ scale Matching Service
+
+Payment Service      tải bình thường
+       ↓
+Không cần scale
+```
+
+Đây là yêu cầu rất quan trọng đối với kiến trúc **hướng dịch vụ**, vì doanh nghiệp không muốn phải tăng tài nguyên cho toàn bộ hệ thống chỉ vì một chức năng bị tải cao. 
+
+---
+
+## 4. Availability & Fault Tolerance
+
+### NFR04 – Availability
+
+Hệ thống đặt xe cốt lõi phải tiếp tục hoạt động khi một chức năng không thiết yếu gặp lỗi.
+
+### NFR05 – Payment Failure Isolation
+
+```text
+Payment Service
+      X
+    Bị lỗi
+
+      ↓
+
+Booking Service      ✓
+Matching Service     ✓
+Trip Service         ✓
+```
+
+### NFR06 – Notification Failure Isolation
+
+```text
+Notification Service
+        X
+      Bị lỗi
+
+        ↓
+
+CAB System vẫn tiếp tục
+xử lý đặt và thực hiện chuyến
+```
+
+Điều này được khách hàng yêu cầu trực tiếp: lỗi ở Payment hoặc Notification không được làm toàn bộ nền tảng đặt xe dừng. 
+
+---
+
+# 5. Security – Bảo mật
+
+Đây là nhóm NFR lớn của CAB System.
+
+| NFR       | Nội dung                                          |
+| --------- | ------------------------------------------------- |
+| **NFR11** | Xác thực Customer và Driver                       |
+| **NFR12** | Kiểm soát quyền của Operation Staff               |
+| **NFR13** | Bảo vệ dữ liệu cá nhân                            |
+| **NFR14** | Bảo vệ dữ liệu phương tiện/vị trí                 |
+| **NFR15** | Bảo vệ dữ liệu giao dịch                          |
+| **NFR16** | Không lưu trực tiếp thông tin thanh toán nhạy cảm |
+| **NFR17** | Audit các thao tác quan trọng                     |
+
+Luồng bảo mật có thể hiểu:
+
+```text
+User
+  ↓
+Authentication
+  ↓
+Authorization
+  ↓
+Có quyền?
+ /     \
+Có    Không
+↓       ↓
+Cho    Từ chối
+phép   truy cập
+```
+
+Khách hàng và tài xế phải được xác thực; các thao tác quản trị phải được kiểm soát quyền. 
+
+---
+
+# 6. Payment Security
+
+Đây là một yêu cầu bảo mật riêng rất quan trọng.
+
+```text
+Customer
+    ↓
+CAB System
+    ↓
+Payment Provider
+    ↓
+Ngân hàng / Payment Network
+```
+
+CAB chỉ nên quản lý những thông tin nghiệp vụ cần thiết như:
+
+```text
+PaymentID
+TripID
+Amount
+PaymentMethod
+PaymentStatus
+ProviderReference
+```
+
+Không lưu trực tiếp:
+
+```text
+✗ Số thẻ đầy đủ
+✗ CVV
+✗ Mật khẩu tài khoản thanh toán
+✗ Thông tin xác thực thanh toán nhạy cảm
+```
+
+Điều này bám đúng yêu cầu của doanh nghiệp về việc không lưu thông tin nhạy cảm của thẻ hoặc tài khoản thanh toán trực tiếp trong CAB. 
+
+---
+
+# 7. Maintainability – Khả năng bảo trì
+
+**NFR07:** Chức năng mới phải có thể triển khai từng phần mà hạn chế ảnh hưởng đến chức năng đang chạy.
+
+Ví dụ:
+
+```text
+CAB System
+
+Booking Service
+Driver Service
+Matching Service
+Trip Service
+Payment Service
+Notification Service
+```
+
+Khi cập nhật:
+
+```text
+Notification Service V1
+          ↓
+Notification Service V2
+```
+
+thì về mặt mục tiêu kiến trúc:
+
+```text
+Booking Service  → không cần sửa
+Driver Service   → không cần sửa
+Trip Service     → hạn chế ảnh hưởng
+Payment Service  → không cần sửa
+```
+
+Yêu cầu triển khai chức năng mới từng phần được khách hàng nêu trực tiếp. 
+
+---
+
+# 8. Extensibility – Khả năng mở rộng chức năng
+
+Đây cũng là yêu cầu quan trọng vì khách hàng muốn CAB trở thành **nền tảng phát triển lâu dài**, không chỉ là ứng dụng đặt xe đơn giản. 
+
+### NFR08 – Thêm loại dịch vụ
+
+Hiện tại:
+
+```text
+CAB
+├── Car
+└── Bike
+```
+
+Tương lai có thể:
+
+```text
+CAB
+├── Car
+├── Bike
+├── Premium
+├── Delivery
+└── ...
+```
+
+Các loại cụ thể trên chỉ là ví dụ minh họa; tài liệu không xác định những dịch vụ tương lai cụ thể.
+
+### NFR09 – Thêm Payment Provider
+
+```text
+Payment Service
+      │
+      ├── Provider A
+      │
+      └── Future Provider
+```
+
+### NFR10 – Thêm Notification Provider
+
+```text
+Notification Service
+         │
+         ├── Provider A
+         ├── Provider B
+         └── Future Provider
+```
+
+Khách hàng yêu cầu kiến trúc cho phép bổ sung dịch vụ, phương thức thanh toán và nhà cung cấp thông báo trong tương lai. 
+# 9. Auditability – Khả năng kiểm tra và truy vết
+
+**NFR17:** Các thao tác quan trọng phải được ghi nhận để có thể kiểm tra khi xảy ra sự cố.
+
+Ví dụ:
+
+```text
+Operation Staff
+      ↓
+Thay đổi trạng thái tài xế
+      ↓
+Audit Log
+
+Who    : StaffID
+What   : Update Driver
+When   : Timestamp
+Target : DriverID
+Action : Update Status
+```
+
+Tài liệu không xác định chính xác **những thao tác nào phải log** hoặc **log giữ bao lâu**, nên đây vẫn cần BA làm rõ. 
+
+---
+
+# 10. Các Non-Functional Requirement chưa đủ thông tin
+
+Đây là phần nên ghi rõ **TBD – To Be Determined**, thay vì tự đặt số.
+
+| Mã            | Nội dung cần làm rõ                    | Hiện trạng    |
+| ------------- | -------------------------------------- | ------------- |
+| **TBD-NFR01** | Thời gian phản hồi tối đa của hệ thống | Chưa xác định |
+| **TBD-NFR02** | Số lượng người dùng đồng thời          | Chưa xác định |
+| **TBD-NFR03** | Số request/giây cần hỗ trợ             | Chưa xác định |
+| **TBD-NFR04** | Mức uptime yêu cầu, ví dụ 99.x%        | Chưa xác định |
+| **TBD-NFR05** | RTO/RPO khi có sự cố                   | Chưa xác định |
+| **TBD-NFR06** | Thời gian lưu dữ liệu                  | Chưa xác định |
+| **TBD-NFR07** | Thời gian lưu Driver Location          | Chưa xác định |
+| **TBD-NFR08** | Thời gian lưu Audit Log                | Chưa xác định |
+| **TBD-NFR09** | Cơ chế xử lý khi mất kết nối mạng      | Chưa xác định |
+| **TBD-NFR10** | KPI cụ thể cho Driver Matching         | Chưa xác định |
+
+Đặc biệt tài liệu xác nhận rằng **xử lý mất kết nối và thời gian lưu dữ liệu vẫn chưa được chốt**. 
