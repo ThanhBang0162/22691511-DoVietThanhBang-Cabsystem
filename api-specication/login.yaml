@@ -1,0 +1,115 @@
+openapi: 3.0.3
+info:
+  title: CAB System API - FR01 Customer Registration
+  version: 1.0.0
+paths:
+  /api/v1/auth/register/customer:
+    post:
+      summary: FR01 - Đăng ký tài khoản khách hàng
+      description: API cho phép người dùng mới đăng ký tài khoản Khách hàng bằng số điện thoại, mật khẩu và họ tên.
+      operationId: registerCustomer
+      tags:
+        - Customer Authentication
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - fullName
+                - phoneNumber
+                - password
+              properties:
+                fullName:
+                  type: string
+                  maxLength: 100
+                  description: Họ và tên đầy đủ của khách hàng.
+                  example: "Nguyen Van A"
+                phoneNumber:
+                  type: string
+                  pattern: '^[0-9]{10,11}$'
+                  description: Số điện thoại dùng để đăng ký và đăng nhập.
+                  example: "0901234567"
+                email:
+                  type: string
+                  format: email
+                  description: Địa chỉ email của khách hàng (không bắt buộc).
+                  example: "nguyenvana@example.com"
+                password:
+                  type: string
+                  format: password
+                  minLength: 8
+                  description: Mật khẩu bảo vệ tài khoản (tối thiểu 8 ký tự).
+                  example: "Customer@123"
+      responses:
+        '201':
+          description: Đăng ký tài khoản thành công.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Đăng ký tài khoản khách hàng thành công."
+                  data:
+                    type: object
+                    properties:
+                      customerId:
+                        type: integer
+                        format: int64
+                        example: 1001
+                      fullName:
+                        type: string
+                        example: "Nguyen Van A"
+                      phoneNumber:
+                        type: string
+                        example: "0901234567"
+                      email:
+                        type: string
+                        example: "nguyenvana@example.com"
+                      createdAt:
+                        type: string
+                        format: date-time
+                        example: "2026-09-10T07:18:00Z"
+        '400':
+          description: Dữ liệu đầu vào không hợp lệ (thiếu trường bắt buộc, định dạng số điện thoại/email sai).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Số điện thoại hoặc Email đã tồn tại trong hệ thống.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Lỗi nội bộ hệ thống.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  schemas:
+    ErrorResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        errorCode:
+          type: string
+          example: "PHONE_NUMBER_ALREADY_EXISTS"
+        message:
+          type: string
+          example: "Số điện thoại đã được đăng ký trên hệ thống."
+        timestamp:
+          type: string
+          format: date-time
+          example: "2026-09-10T07:18:00Z"
