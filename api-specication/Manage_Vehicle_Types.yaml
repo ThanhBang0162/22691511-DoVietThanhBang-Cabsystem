@@ -1,0 +1,165 @@
+openapi: 3.0.3
+info:
+  title: CAB System API - FR43 Manage Vehicle Types
+  version: 1.0.0
+paths:
+  /api/v1/admin/vehicle-types:
+    post:
+      summary: FR43 - Tạo mới loại phương tiện trong hệ thống
+      description: "API dành cho Quản trị viên (Admin) để khởi tạo loại phương tiện mới kèm thiết lập cước phí cơ bản và số chỗ ngồi."
+      operationId: createVehicleType
+      tags:
+        - Admin - Vehicle Type Management
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateVehicleTypeRequest'
+      responses:
+        '201':
+          description: "Tạo mới loại phương tiện thành công."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateVehicleTypeSuccessResponse'
+        '400':
+          description: "Dữ liệu đầu vào không hợp lệ."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: "Chưa xác thực token hoặc Token hết hạn."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: "Không có quyền Quản trị viên (Admin) để thực hiện hành động này."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: "Mã loại phương tiện đã tồn tại trong hệ thống."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: "Lỗi hệ thống nội bộ."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    CreateVehicleTypeRequest:
+      type: object
+      required:
+        - typeCode
+        - typeName
+        - capacity
+        - baseFare
+        - farePerKm
+      properties:
+        typeCode:
+          type: string
+          description: "Mã định danh loại phương tiện (duy nhất)."
+          example: "CAR_7_SEATS"
+        typeName:
+          type: string
+          description: "Tên hiển thị của loại phương tiện."
+          example: "Xe ô tô 7 chỗ"
+        capacity:
+          type: integer
+          minimum: 1
+          description: "Sức chứa tối đa (số hành khách)."
+          example: 7
+        baseFare:
+          type: number
+          format: double
+          minimum: 0
+          description: "Giá cước mở cửa cơ bản (VND)."
+          example: 20000
+        farePerKm:
+          type: number
+          format: double
+          minimum: 0
+          description: "Giá cước tính theo mỗi kilômét (VND/km)."
+          example: 15000
+        description:
+          type: string
+          description: "Mô tả thêm về dòng xe."
+          example: "Dành cho nhóm gia đình hoặc đi đông người kèm nhiều hành lý."
+
+    VehicleTypeData:
+      type: object
+      properties:
+        vehicleTypeId:
+          type: integer
+          format: int64
+          example: 10
+        typeCode:
+          type: string
+          example: "CAR_7_SEATS"
+        typeName:
+          type: string
+          example: "Xe ô tô 7 chỗ"
+        capacity:
+          type: integer
+          example: 7
+        baseFare:
+          type: number
+          format: double
+          example: 20000
+        farePerKm:
+          type: number
+          format: double
+          example: 15000
+        isActive:
+          type: boolean
+          example: true
+        createdAt:
+          type: string
+          format: date-time
+          example: "2026-09-16T14:45:00Z"
+
+    CreateVehicleTypeSuccessResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: "Tạo mới loại phương tiện thành công."
+        data:
+          $ref: '#/components/schemas/VehicleTypeData'
+
+    ErrorResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        errorCode:
+          type: string
+          example: "VEHICLE_TYPE_ALREADY_EXISTS"
+        message:
+          type: string
+          example: "Mã loại phương tiện 'CAR_7_SEATS' đã tồn tại trong hệ thống."
+        timestamp:
+          type: string
+          format: date-time
+          example: "2026-09-16T14:45:00Z"
