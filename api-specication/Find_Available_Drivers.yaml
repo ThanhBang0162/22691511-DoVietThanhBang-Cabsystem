@@ -1,0 +1,152 @@
+openapi: 3.0.3
+info:
+  title: CAB System API - FR16 Find Available Drivers
+  version: 1.0.0
+paths:
+  /api/v1/matching/available-drivers:
+    post:
+      summary: FR16 - Tìm danh sách tài xế đang ở trạng thái sẵn sàng
+      description: "API nội bộ dùng cho Driver Matching Service để truy vấn danh sách các tài xế đang ở trạng thái sẵn sàng nhận chuyến (AVAILABLE) quanh vị trí đón khách."
+      operationId: findAvailableDrivers
+      tags:
+        - Driver Matching
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FindAvailableDriversRequest'
+      responses:
+        '200':
+          description: "Truy vấn danh sách tài xế sẵn sàng thành công."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AvailableDriversSuccessResponse'
+        '400':
+          description: "Tham số truy vấn (tọa độ GPS hoặc bán kính) không hợp lệ."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: "Chưa xác thực token hoặc Token không có quyền truy cập API nội bộ."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: "Lỗi hệ thống nội bộ."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    FindAvailableDriversRequest:
+      type: object
+      required:
+        - pickupLatitude
+        - pickupLongitude
+      properties:
+        pickupLatitude:
+          type: number
+          format: double
+          minimum: -90
+          maximum: 90
+          description: "Tọa độ vĩ độ (Latitude) tại điểm đón của khách hàng."
+          example: 10.7769
+        pickupLongitude:
+          type: number
+          format: double
+          minimum: -180
+          maximum: 180
+          description: "Tọa độ kinh độ (Longitude) tại điểm đón của khách hàng."
+          example: 106.7009
+        radiusInKm:
+          type: number
+          format: float
+          default: 5.0
+          description: "Bán kính quét tài xế tính bằng kilometer (mặc định 5 km)."
+          example: 3.5
+
+    DriverSummaryInfo:
+      type: object
+      properties:
+        driverId:
+          type: integer
+          format: int64
+          example: 201
+        fullName:
+          type: string
+          example: "Trần Văn B"
+        phoneNumber:
+          type: string
+          example: "0987654321"
+        currentLatitude:
+          type: number
+          format: double
+          example: 10.7780
+        currentLongitude:
+          type: number
+          format: double
+          example: 106.7020
+        availabilityStatus:
+          type: string
+          enum: [AVAILABLE]
+          example: "AVAILABLE"
+        distanceInKm:
+          type: number
+          format: float
+          description: "Khoảng cách từ vị trí hiện tại của tài xế đến điểm đón."
+          example: 0.85
+
+    AvailableDriversData:
+      type: object
+      properties:
+        totalFound:
+          type: integer
+          description: "Tổng số tài xế đang sẵn sàng tìm thấy trong bán kính."
+          example: 3
+        drivers:
+          type: array
+          items:
+            $ref: '#/components/schemas/DriverSummaryInfo'
+
+    AvailableDriversSuccessResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: "Lấy danh sách tài xế đang sẵn sàng thành công."
+        data:
+          $ref: '#/components/schemas/AvailableDriversData'
+
+    ErrorResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        errorCode:
+          type: string
+          example: "INVALID_SEARCH_RADIUS"
+        message:
+          type: string
+          example: "Bán kính tìm kiếm phải lớn hơn 0."
+        timestamp:
+          type: string
+          format: date-time
+          example: "2026-09-16T13:20:00Z"
