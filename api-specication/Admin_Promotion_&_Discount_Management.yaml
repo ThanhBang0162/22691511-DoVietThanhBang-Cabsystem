@@ -1,0 +1,427 @@
+openapi: 3.0.3
+info:
+  title: CAB System API - FR56 Admin Promotion & Discount Management
+  version: 1.0.0
+paths:
+  /api/v1/admin/promotions:
+    get:
+      summary: FR56 - Tra cứu danh sách khuyến mãi và mã giảm giá
+      description: "API dành cho Quản trị viên (Admin) để lấy danh sách các mã khuyến mãi trên hệ thống, hỗ trợ lọc theo trạng thái (ACTIVE, EXPIRED, DISABLED) và phân trang."
+      operationId: getAdminPromotions
+      tags:
+        - Admin - Promotion Management
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          required: false
+          description: "Số trang cần truy vấn (mặc định 1)."
+          schema:
+            type: integer
+            default: 1
+            example: 1
+        - name: limit
+          in: query
+          required: false
+          description: "Số lượng bản ghi trên một trang (mặc định 10)."
+          schema:
+            type: integer
+            default: 10
+            example: 10
+        - name: status
+          in: query
+          required: false
+          description: "Lọc theo trạng thái chương trình khuyến mãi."
+          schema:
+            type: string
+            enum: [ACTIVE, UPCOMING, EXPIRED, DISABLED]
+            example: "ACTIVE"
+        - name: code
+          in: query
+          required: false
+          description: "Tìm kiếm chính xác hoặc tương đối theo mã voucher."
+          schema:
+            type: string
+            example: "HELLOSEPT"
+      responses:
+        '200':
+          description: "Lấy danh sách khuyến mãi thành công."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PromotionListSuccessResponse'
+        '401':
+          description: "Chưa xác thực token hoặc Token hết hạn."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: "Không có quyền Quản trị viên (Admin)."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: "Lỗi hệ thống nội bộ."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    post:
+      summary: FR56 - Tạo chương trình khuyến mãi / Mã giảm giá mới
+      description: "API dành cho Quản trị viên (Admin) để tạo mã giảm giá mới với các điều kiện áp dụng (mức giảm %, số tiền giảm tối đa, đơn hàng tối thiểu, lượt dùng)."
+      operationId: createPromotion
+      tags:
+        - Admin - Promotion Management
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePromotionRequest'
+      responses:
+        '201':
+          description: "Tạo mã khuyến mãi thành công."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PromotionDetailSuccessResponse'
+        '400':
+          description: "Dữ liệu khuyến mãi không hợp lệ (ví dụ: mã đã tồn tại, ngày bắt đầu lớn hơn ngày kết thúc)."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: "Chưa xác thực token hoặc Token hết hạn."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: "Không có quyền Quản trị viên (Admin)."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: "Lỗi hệ thống nội bộ."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/admin/promotions/{promotionId}:
+    get:
+      summary: FR56 - Xem chi tiết chương trình khuyến mãi
+      description: "API dành cho Quản trị viên (Admin) để lấy thông tin chi tiết và thống kê sử dụng của một mã khuyến mãi cụ thể."
+      operationId: getPromotionDetail
+      tags:
+        - Admin - Promotion Management
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: promotionId
+          in: path
+          required: true
+          description: "ID duy nhất của chương trình khuyến mãi."
+          schema:
+            type: integer
+            format: int64
+            example: 301
+      responses:
+        '200':
+          description: "Lấy chi tiết khuyến mãi thành công."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PromotionDetailSuccessResponse'
+        '401':
+          description: "Chưa xác thực token hoặc Token hết hạn."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: "Không có quyền Quản trị viên (Admin)."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: "Không tìm thấy chương trình khuyến mãi."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: "Lỗi hệ thống nội bộ."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/admin/promotions/{promotionId}/status:
+    patch:
+      summary: FR56 - Thay đổi trạng thái kích hoạt của mã khuyến mãi
+      description: "API dành cho Quản trị viên (Admin) để kích hoạt (ACTIVE) hoặc vô hiệu hóa/dừng sớm (DISABLED) một mã khuyến mãi."
+      operationId: updatePromotionStatus
+      tags:
+        - Admin - Promotion Management
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: promotionId
+          in: path
+          required: true
+          description: "ID duy nhất của chương trình khuyến mãi."
+          schema:
+            type: integer
+            format: int64
+            example: 301
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdatePromotionStatusRequest'
+      responses:
+        '200':
+          description: "Cập nhật trạng thái khuyến mãi thành công."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PromotionDetailSuccessResponse'
+        '400':
+          description: "Trạng thái cập nhật không hợp lệ."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: "Chưa xác thực token hoặc Token hết hạn."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: "Không có quyền Quản trị viên (Admin)."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: "Không tìm thấy chương trình khuyến mãi."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: "Lỗi hệ thống nội bộ."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    CreatePromotionRequest:
+      type: object
+      required:
+        - code
+        - title
+        - discountType
+        - discountValue
+        - minTripFare
+        - usageLimit
+        - startDate
+        - endDate
+      properties:
+        code:
+          type: string
+          description: "Mã voucher (duy nhất, viết hoa không dấu)."
+          example: "HELLOSEPT"
+        title:
+          type: string
+          description: "Tên chương trình khuyến mãi."
+          example: "Khuyến mãi chào tháng 9"
+        description:
+          type: string
+          example: "Giảm 20% tối đa 30.000 VNĐ cho chuyến đi từ 50.000 VNĐ."
+        discountType:
+          type: string
+          enum: [PERCENTAGE, FIXED_AMOUNT]
+          description: "Loại giảm giá: PERCENTAGE (theo %) hoặc FIXED_AMOUNT (số tiền cố định)."
+          example: "PERCENTAGE"
+        discountValue:
+          type: number
+          format: double
+          description: "Giá trị giảm (ví dụ 20 cho 20% hoặc 20000 cho 20.000 VNĐ)."
+          example: 20
+        maxDiscountAmount:
+          type: number
+          format: double
+          description: "Số tiền giảm tối đa (áp dụng cho PERCENTAGE)."
+          example: 30000
+        minTripFare:
+          type: number
+          format: double
+          description: "Giá trị chuyến đi tối thiểu để áp dụng mã (VND)."
+          example: 50000
+        usageLimit:
+          type: integer
+          description: "Tổng lượt sử dụng tối đa của toàn hệ thống."
+          example: 1000
+        userUsageLimit:
+          type: integer
+          description: "Số lượt sử dụng tối đa trên mỗi khách hàng."
+          example: 2
+        startDate:
+          type: string
+          format: date-time
+          example: "2026-09-01T00:00:00Z"
+        endDate:
+          type: string
+          format: date-time
+          example: "2026-09-30T23:59:59Z"
+
+    UpdatePromotionStatusRequest:
+      type: object
+      required:
+        - status
+      properties:
+        status:
+          type: string
+          enum: [ACTIVE, DISABLED]
+          example: "DISABLED"
+
+    PromotionItem:
+      type: object
+      properties:
+        promotionId:
+          type: integer
+          format: int64
+          example: 301
+        code:
+          type: string
+          example: "HELLOSEPT"
+        title:
+          type: string
+          example: "Khuyến mãi chào tháng 9"
+        discountType:
+          type: string
+          enum: [PERCENTAGE, FIXED_AMOUNT]
+          example: "PERCENTAGE"
+        discountValue:
+          type: number
+          format: double
+          example: 20
+        maxDiscountAmount:
+          type: number
+          format: double
+          example: 30000
+        minTripFare:
+          type: number
+          format: double
+          example: 50000
+        usageLimit:
+          type: integer
+          example: 1000
+        usedCount:
+          type: integer
+          description: "Số lượt đã sử dụng thực tế."
+          example: 342
+        status:
+          type: string
+          enum: [ACTIVE, UPCOMING, EXPIRED, DISABLED]
+          example: "ACTIVE"
+        startDate:
+          type: string
+          format: date-time
+          example: "2026-09-01T00:00:00Z"
+        endDate:
+          type: string
+          format: date-time
+          example: "2026-09-30T23:59:59Z"
+        createdAt:
+          type: string
+          format: date-time
+          example: "2026-08-28T10:00:00Z"
+
+    PaginationMeta:
+      type: object
+      properties:
+        currentPage:
+          type: integer
+          example: 1
+        totalPages:
+          type: integer
+          example: 3
+        pageSize:
+          type: integer
+          example: 10
+        totalItems:
+          type: integer
+          example: 28
+
+    PromotionListData:
+      type: object
+      properties:
+        promotions:
+          type: array
+          items:
+            $ref: '#/components/schemas/PromotionItem'
+        pagination:
+          $ref: '#/components/schemas/PaginationMeta'
+
+    PromotionListSuccessResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: "Lấy danh sách khuyến mãi thành công."
+        data:
+          $ref: '#/components/schemas/PromotionListData'
+
+    PromotionDetailSuccessResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: "Thao tác khuyến mãi thành công."
+        data:
+          $ref: '#/components/schemas/PromotionItem'
+
+    ErrorResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        errorCode:
+          type: string
+          example: "PROMOTION_CODE_ALREADY_EXISTS"
+        message:
+          type: string
+          example: "Mã khuyến mãi HELLOSEPT đã tồn tại trên hệ thống."
+        timestamp:
+          type: string
+          format: date-time
+          example: "2026-09-16T15:40:00Z"
