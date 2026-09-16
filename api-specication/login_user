@@ -1,0 +1,114 @@
+openapi: 3.0.3
+info:
+  title: CAB System API - FR02 User Login
+  version: 1.0.0
+paths:
+  /api/v1/auth/login:
+    post:
+      summary: FR02 - Đăng nhập người dùng
+      description: API xác thực thông tin đăng nhập (Số điện thoại/Email và Mật khẩu) của người dùng và trả về JWT Access Token phục vụ xác thực ở các API sau.
+      operationId: loginUser
+      tags:
+        - Authentication
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - username
+                - password
+              properties:
+                username:
+                  type: string
+                  description: Số điện thoại hoặc Email đã đăng ký của người dùng.
+                  example: "0901234567"
+                password:
+                  type: string
+                  format: password
+                  description: Mật khẩu truy cập tài khoản.
+                  example: "Customer@123"
+      responses:
+        '200':
+          description: Đăng nhập thành công, trả về thông tin xác thực và Token.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Đăng nhập thành công."
+                  data:
+                    type: object
+                    properties:
+                      userId:
+                        type: integer
+                        format: int64
+                        example: 1001
+                      userType:
+                        type: string
+                        enum: [CUSTOMER, DRIVER, OPERATION_STAFF]
+                        description: Vai trò người dùng trong hệ thống.
+                        example: "CUSTOMER"
+                      fullName:
+                        type: string
+                        example: "Nguyen Van A"
+                      accessToken:
+                        type: string
+                        description: JWT Bearer Token dùng cho Header Authorization.
+                        example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMDAxIiwicm9sZSI6IkNVU1RPTUVSIiwiaWF0IjoxNzU3NTE3NTIwLCJleHAiOjE3NTc2MDM5MjB9.signature"
+                      tokenType:
+                        type: string
+                        example: "Bearer"
+                      expiresIn:
+                        type: integer
+                        description: Thời hạn của token tính bằng giây (ví dụ 86400 giây = 24 giờ).
+                        example: 86400
+        '400':
+          description: Dữ liệu gửi lên không đúng định dạng hoặc thiếu trường bắt buộc.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Tên đăng nhập hoặc mật khẩu không chính xác.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Tài khoản đã bị khóa hoặc ngừng hoạt động.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Lỗi nội bộ hệ thống.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  schemas:
+    ErrorResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        errorCode:
+          type: string
+          example: "INVALID_CREDENTIALS"
+        message:
+          type: string
+          example: "Số điện thoại hoặc mật khẩu không đúng."
+        timestamp:
+          type: string
+          format: date-time
+          example: "2026-09-10T07:20:00Z"
