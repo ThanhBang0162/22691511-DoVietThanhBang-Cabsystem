@@ -1,0 +1,156 @@
+openapi: 3.0.3
+info:
+  title: CAB System API - FR34 Process Trip Payment
+  version: 1.0.0
+paths:
+  /api/v1/payments/process:
+    post:
+      summary: FR34 - Xử lý thanh toán chuyến đi
+      description: "API thực hiện xử lý thanh toán cước phí chuyến đi thông qua các phương thức thanh toán như Tiền mặt, Ví điện tử hoặc Thẻ ngân hàng."
+      operationId: processTripPayment
+      tags:
+        - Pricing & Payment
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProcessPaymentRequest'
+      responses:
+        '200':
+          description: "Xử lý thanh toán chuyến đi thành công."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProcessPaymentSuccessResponse'
+        '400':
+          description: "Dữ liệu giao dịch không hợp lệ hoặc số tiền thanh toán không khớp."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: "Chưa xác thực token hoặc Token hết hạn."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '402':
+          description: "Thanh toán thất bại do số dư không đủ hoặc cổng thanh toán từ chối."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: "Không tìm thấy chuyến đi tương ứng."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: "Lỗi hệ thống nội bộ."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    ProcessPaymentRequest:
+      type: object
+      required:
+        - tripId
+        - amount
+        - paymentMethod
+      properties:
+        tripId:
+          type: integer
+          format: int64
+          description: "Mã định danh duy nhất của chuyến đi cần thanh toán."
+          example: 9001
+        amount:
+          type: number
+          format: double
+          minimum: 0
+          description: "Số tiền cần thanh toán (VND)."
+          example: 125000
+        paymentMethod:
+          type: string
+          enum: [CASH, WALLET, CREDIT_CARD, BANK_TRANSFER]
+          description: "Phương thức thanh toán được lựa chọn."
+          example: "WALLET"
+        transactionReference:
+          type: string
+          description: "Mã giao dịch từ cổng thanh toán bên thứ ba (nếu có)."
+          example: "TXN_20260916_998811"
+
+    PaymentData:
+      type: object
+      properties:
+        paymentId:
+          type: integer
+          format: int64
+          example: 7001
+        tripId:
+          type: integer
+          format: int64
+          example: 9001
+        amount:
+          type: number
+          format: double
+          example: 125000
+        currency:
+          type: string
+          example: "VND"
+        paymentMethod:
+          type: string
+          enum: [CASH, WALLET, CREDIT_CARD, BANK_TRANSFER]
+          example: "WALLET"
+        paymentStatus:
+          type: string
+          enum: [SUCCESS, PENDING, FAILED]
+          example: "SUCCESS"
+        transactionId:
+          type: string
+          example: "PAY-9001-20260916"
+        paidAt:
+          type: string
+          format: date-time
+          example: "2026-09-16T14:35:00Z"
+
+    ProcessPaymentSuccessResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: "Xử lý thanh toán chuyến đi thành công."
+        data:
+          $ref: '#/components/schemas/PaymentData'
+
+    ErrorResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        errorCode:
+          type: string
+          example: "INSUFFICIENT_BALANCE"
+        message:
+          type: string
+          example: "Số dư tài khoản ví không đủ để thực hiện thanh toán."
+        timestamp:
+          type: string
+          format: date-time
+          example: "2026-09-16T14:35:00Z"
