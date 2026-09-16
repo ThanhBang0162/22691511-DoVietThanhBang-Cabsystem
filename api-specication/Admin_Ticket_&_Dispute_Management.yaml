@@ -1,0 +1,389 @@
+openapi: 3.0.3
+info:
+  title: CAB System API - FR57 Admin Ticket & Dispute Management
+  version: 1.0.0
+paths:
+  /api/v1/admin/support/tickets:
+    get:
+      summary: FR57 - Tra cứu danh sách yêu cầu hỗ trợ và khiếu nại
+      description: "API dành cho Quản trị viên (Admin) để lấy danh sách các ticket hỗ trợ và khiếu nại trên hệ thống, hỗ trợ lọc theo trạng thái, mức độ ưu tiên và loại khiếu nại."
+      operationId: getAdminSupportTickets
+      tags:
+        - Admin - Support & Dispute Management
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          required: false
+          description: "Số trang cần truy vấn (mặc định 1)."
+          schema:
+            type: integer
+            default: 1
+            example: 1
+        - name: limit
+          in: query
+          required: false
+          description: "Số lượng bản ghi trên một trang (mặc định 10)."
+          schema:
+            type: integer
+            default: 10
+            example: 10
+        - name: status
+          in: query
+          required: false
+          description: "Lọc theo trạng thái xử lý của ticket."
+          schema:
+            type: string
+            enum: [OPEN, IN_PROGRESS, RESOLVED, CLOSED, REJECTED]
+            example: "OPEN"
+        - name: priority
+          in: query
+          required: false
+          description: "Lọc theo mức độ ưu tiên."
+          schema:
+            type: string
+            enum: [LOW, MEDIUM, HIGH, URGENT]
+            example: "HIGH"
+        - name: category
+          in: query
+          required: false
+          description: "Phân loại khiếu nại (ví dụ: INCORRECT_FARE, DRIVER_BEHAVIOR, LOST_ITEM, APP_ISSUE)."
+          schema:
+            type: string
+            enum: [INCORRECT_FARE, DRIVER_BEHAVIOR, LOST_ITEM, APP_ISSUE, SAFETY_CONCERN, OTHER]
+            example: "INCORRECT_FARE"
+      responses:
+        '200':
+          description: "Lấy danh sách ticket khiếu nại thành công."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TicketListSuccessResponse'
+        '401':
+          description: "Chưa xác thực token hoặc Token hết hạn."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: "Không có quyền Quản trị viên (Admin)."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: "Lỗi hệ thống nội bộ."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/admin/support/tickets/{ticketId}:
+    get:
+      summary: FR57 - Xem chi tiết yêu cầu hỗ trợ hoặc khiếu nại
+      description: "API dành cho Quản trị viên (Admin) để lấy chi tiết ticket, bao gồm thông tin chuyến đi liên quan, bằng chứng/hình ảnh đính kèm và lịch sử xử lý."
+      operationId: getAdminSupportTicketDetail
+      tags:
+        - Admin - Support & Dispute Management
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: ticketId
+          in: path
+          required: true
+          description: "Mã định danh duy nhất của ticket."
+          schema:
+            type: integer
+            format: int64
+            example: 5001
+      responses:
+        '200':
+          description: "Lấy chi tiết ticket thành công."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TicketDetailSuccessResponse'
+        '401':
+          description: "Chưa xác thực token hoặc Token hết hạn."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: "Không có quyền Quản trị viên (Admin)."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: "Không tìm thấy ticket khiếu nại."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: "Lỗi hệ thống nội bộ."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/admin/support/tickets/{ticketId}/resolve:
+    post:
+      summary: FR57 - Xử lý và đưa ra kết luận giải quyết khiếu nại
+      description: "API dành cho Quản trị viên (Admin) để cập nhật trạng thái kết luận ticket, thực hiện hoàn tiền (nếu có) hoặc áp dụng chế tài vi phạm với tài xế/khách hàng."
+      operationId: resolveSupportTicket
+      tags:
+        - Admin - Support & Dispute Management
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: ticketId
+          in: path
+          required: true
+          description: "Mã định danh duy nhất của ticket."
+          schema:
+            type: integer
+            format: int64
+            example: 5001
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResolveTicketRequest'
+      responses:
+        '200':
+          description: "Xử lý và cập nhật kết quả khiếu nại thành công."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TicketDetailSuccessResponse'
+        '400':
+          description: "Dữ liệu xử lý không hợp lệ hoặc ticket đã đóng."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: "Chưa xác thực token hoặc Token hết hạn."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: "Không có quyền Quản trị viên (Admin)."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: "Không tìm thấy ticket khiếu nại."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: "Lỗi hệ thống nội bộ."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    TicketItem:
+      type: object
+      properties:
+        ticketId:
+          type: integer
+          format: int64
+          example: 5001
+        tripId:
+          type: integer
+          format: int64
+          example: 9001
+        reporterType:
+          type: string
+          enum: [CUSTOMER, DRIVER]
+          example: "CUSTOMER"
+        reporterName:
+          type: string
+          example: "Nguyen Van A"
+        category:
+          type: string
+          enum: [INCORRECT_FARE, DRIVER_BEHAVIOR, LOST_ITEM, APP_ISSUE, SAFETY_CONCERN, OTHER]
+          example: "INCORRECT_FARE"
+        subject:
+          type: string
+          example: "Tài xế tính thêm tiền mặt dù đã thanh toán qua ví"
+        priority:
+          type: string
+          enum: [LOW, MEDIUM, HIGH, URGENT]
+          example: "HIGH"
+        status:
+          type: string
+          enum: [OPEN, IN_PROGRESS, RESOLVED, CLOSED, REJECTED]
+          example: "OPEN"
+        createdAt:
+          type: string
+          format: date-time
+          example: "2026-09-16T10:15:00Z"
+
+    PaginationMeta:
+      type: object
+      properties:
+        currentPage:
+          type: integer
+          example: 1
+        totalPages:
+          type: integer
+          example: 4
+        pageSize:
+          type: integer
+          example: 10
+        totalItems:
+          type: integer
+          example: 35
+
+    TicketListData:
+      type: object
+      properties:
+        tickets:
+          type: array
+          items:
+            $ref: '#/components/schemas/TicketItem'
+        pagination:
+          $ref: '#/components/schemas/PaginationMeta'
+
+    TicketListSuccessResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: "Lấy danh sách ticket hỗ trợ thành công."
+        data:
+          $ref: '#/components/schemas/TicketListData'
+
+    ResolveTicketRequest:
+      type: object
+      required:
+        - action
+        - resolutionNotes
+      properties:
+        action:
+          type: string
+          enum: [REFUND_CUSTOMER, WARN_DRIVER, SUSPEND_DRIVER, REJECT_TICKET, CLOSE_TICKET]
+          description: "Hành động xử lý của Admin."
+          example: "REFUND_CUSTOMER"
+        refundAmount:
+          type: number
+          format: double
+          description: "Số tiền hoàn lại cho khách hàng (nếu action là REFUND_CUSTOMER)."
+          example: 35000
+        resolutionNotes:
+          type: string
+          description: "Ghi chú/Kết luận giải quyết từ Admin."
+          example: "Đã xác minh tài xế thu dư tiền. Hoàn 35.000 VNĐ vào ví khách hàng và gửi cảnh cáo tài xế."
+
+    TicketDetailData:
+      type: object
+      properties:
+        ticketId:
+          type: integer
+          format: int64
+          example: 5001
+        tripId:
+          type: integer
+          format: int64
+          example: 9001
+        reporterId:
+          type: integer
+          format: int64
+          example: 1001
+        reporterType:
+          type: string
+          enum: [CUSTOMER, DRIVER]
+          example: "CUSTOMER"
+        reporterName:
+          type: string
+          example: "Nguyen Van A"
+        reporterPhone:
+          type: string
+          example: "0901234567"
+        category:
+          type: string
+          enum: [INCORRECT_FARE, DRIVER_BEHAVIOR, LOST_ITEM, APP_ISSUE, SAFETY_CONCERN, OTHER]
+          example: "INCORRECT_FARE"
+        subject:
+          type: string
+          example: "Tài xế tính thêm tiền mặt dù đã thanh toán qua ví"
+        description:
+          type: string
+          example: "Chuyến đi 9001 tôi đã trả bằng Ví MoMo nhưng tài xế yêu cầu đưa thêm 35.000 VNĐ tiền mặt."
+        attachments:
+          type: array
+          items:
+            type: string
+          example: ["https://storage.cabsystem.com/proofs/ticket-5001-1.jpg"]
+        priority:
+          type: string
+          enum: [LOW, MEDIUM, HIGH, URGENT]
+          example: "HIGH"
+        status:
+          type: string
+          enum: [OPEN, IN_PROGRESS, RESOLVED, CLOSED, REJECTED]
+          example: "RESOLVED"
+        resolutionNotes:
+          type: string
+          example: "Đã xác minh tài xế thu dư tiền. Hoàn 35.000 VNĐ vào ví khách hàng và gửi cảnh cáo tài xế."
+        resolvedByAdminName:
+          type: string
+          example: "Admin Nguyễn Văn X"
+        resolvedAt:
+          type: string
+          format: date-time
+          example: "2026-09-16T14:00:00Z"
+        createdAt:
+          type: string
+          format: date-time
+          example: "2026-09-16T10:15:00Z"
+
+    TicketDetailSuccessResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: "Lấy chi tiết ticket hỗ trợ thành công."
+        data:
+          $ref: '#/components/schemas/TicketDetailData'
+
+    ErrorResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        errorCode:
+          type: string
+          example: "TICKET_ALREADY_CLOSED"
+        message:
+          type: string
+          example: "Ticket này đã được giải quyết hoặc đóng, không thể cập nhật thêm."
+        timestamp:
+          type: string
+          format: date-time
+          example: "2026-09-16T15:45:00Z"
