@@ -1,0 +1,150 @@
+openapi: 3.0.3
+info:
+  title: CAB System API - FR25 Assign Driver to Trip Request
+  version: 1.0.0
+paths:
+  /api/v1/trips:
+    post:
+      summary: FR25 - Ghép tài xế với yêu cầu chuyến (Khởi tạo Trip)
+      description: "API hệ thống tạo bản ghi chuyến đi (Trip) chính thức sau khi tài xế đồng ý chấp nhận yêu cầu đặt xe từ khách hàng."
+      operationId: createTrip
+      tags:
+        - Trip Management
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTripRequest'
+      responses:
+        '201':
+          description: "Khởi tạo chuyến đi và ghép tài xế thành công."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateTripSuccessResponse'
+        '400':
+          description: "Dữ liệu đầu vào không hợp lệ hoặc thiếu thông tin bắt buộc."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: "Chưa xác thực token hoặc Token không có quyền thực hiện."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: "Yêu cầu đặt xe này đã được khởi tạo thành chuyến đi trước đó."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: "Lỗi hệ thống nội bộ."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    CreateTripRequest:
+      type: object
+      required:
+        - requestId
+        - driverId
+        - vehicleId
+      properties:
+        requestId:
+          type: integer
+          format: int64
+          description: "Mã định danh của yêu cầu đặt xe từ khách hàng."
+          example: 5001
+        driverId:
+          type: integer
+          format: int64
+          description: "Mã định danh của tài xế đã chấp nhận chuyến."
+          example: 201
+        vehicleId:
+          type: integer
+          format: int64
+          description: "Mã định danh phương tiện do tài xế sử dụng."
+          example: 301
+
+    TripData:
+      type: object
+      properties:
+        tripId:
+          type: integer
+          format: int64
+          example: 9001
+        requestId:
+          type: integer
+          format: int64
+          example: 5001
+        customerId:
+          type: integer
+          format: int64
+          example: 1001
+        driverId:
+          type: integer
+          format: int64
+          example: 201
+        vehicleId:
+          type: integer
+          format: int64
+          example: 301
+        tripStatus:
+          type: string
+          enum: [DRIVER_ASSIGNED]
+          description: "Trạng thái khởi đầu của chuyến đi sau khi ghép tài xế."
+          example: "DRIVER_ASSIGNED"
+        pickupLocation:
+          type: string
+          example: "123 Nguyễn Huệ, Phường Bến Nghé, Quận 1, TP. Hồ Chí Minh"
+        destination:
+          type: string
+          example: "Sân bay Tân Sơn Nhất, Quận Tân Bình, TP. Hồ Chí Minh"
+        createdAt:
+          type: string
+          format: date-time
+          example: "2026-09-16T13:35:00Z"
+
+    CreateTripSuccessResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: "Khởi tạo chuyến đi và ghép tài xế thành công."
+        data:
+          $ref: '#/components/schemas/TripData'
+
+    ErrorResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        errorCode:
+          type: string
+          example: "TRIP_ALREADY_EXISTS"
+        message:
+          type: string
+          example: "Chuyến đi tương ứng với yêu cầu đặt xe này đã được tạo."
+        timestamp:
+          type: string
+          format: date-time
+          example: "2026-09-16T13:35:00Z"
