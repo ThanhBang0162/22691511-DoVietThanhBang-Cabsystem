@@ -1,0 +1,124 @@
+openapi: 3.0.3
+info:
+  title: CAB System API - FR07 Set Destination Location
+  version: 1.0.0
+paths:
+  /api/v1/bookings/destination-location:
+    post:
+      summary: FR07 - Nhập và ghi nhận điểm đến của khách hàng
+      description: "API ghi nhận vị trí điểm đến của khách hàng (địa chỉ hiển thị và tọa độ kinh/vĩ độ) phục vụ cho yêu cầu tính quãng đường và đặt xe."
+      operationId: setDestinationLocation
+      tags:
+        - Booking
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - address
+                - latitude
+                - longitude
+              properties:
+                address:
+                  type: string
+                  maxLength: 255
+                  description: "Tên địa chỉ hoặc mô tả vị trí điểm đến chi tiết."
+                  example: "Sân bay Tân Sơn Nhất, Trường Sơn, Phường 2, Quận Tân Bình, TP. Hồ Chí Minh"
+                latitude:
+                  type: number
+                  format: double
+                  minimum: -90
+                  maximum: 90
+                  description: "Tọa độ vĩ độ (Latitude) của điểm đến."
+                  example: 10.8185
+                longitude:
+                  type: number
+                  format: double
+                  minimum: -180
+                  maximum: 180
+                  description: "Tọa độ kinh độ (Longitude) của điểm đến."
+                  example: 106.6588
+                notesForDriver:
+                  type: string
+                  maxLength: 150
+                  description: "Ghi chú thêm cho tài xế về điểm trả khách (ví dụ: Ga quốc nội, Cột số 5)."
+                  example: "Trả khách tại Ga quốc nội Cột số 5"
+      responses:
+        '200':
+          description: "Đã tiếp nhận và lưu thông tin điểm đến thành công."
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Đã xác nhận điểm đến thành công."
+                  data:
+                    type: object
+                    properties:
+                      destinationId:
+                        type: integer
+                        format: int64
+                        example: 502
+                      address:
+                        type: string
+                        example: "Sân bay Tân Sơn Nhất, Trường Sơn, Phường 2, Quận Tân Bình, TP. Hồ Chí Minh"
+                      latitude:
+                        type: number
+                        example: 10.8185
+                      longitude:
+                        type: number
+                        example: 106.6588
+                      notesForDriver:
+                        type: string
+                        example: "Trả khách tại Ga quốc nội Cột số 5"
+        '400':
+          description: "Dữ liệu tọa độ hoặc địa chỉ không hợp lệ."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: "Chưa xác thực token hoặc Token hết hạn."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: "Lỗi hệ thống nội bộ."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    ErrorResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        errorCode:
+          type: string
+          example: "INVALID_COORDINATES"
+        message:
+          type: string
+          example: "Tọa độ vĩ độ hoặc kinh độ không hợp lệ."
+        timestamp:
+          type: string
+          format: date-time
+          example: "2026-09-16T12:50:00Z"
