@@ -1,0 +1,385 @@
+openapi: 3.0.3
+info:
+  title: CAB System API - FR61 Admin Emergency & Safety Incident Management
+  version: 1.0.0
+paths:
+  /api/v1/admin/safety/incidents:
+    get:
+      summary: FR61 - Tra cứu danh sách sự cố an toàn và cảnh báo SOS
+      description: "API dành cho Quản trị viên (Admin) để lấy danh sách các tín hiệu SOS hoặc cảnh báo sự cố an toàn trên hệ thống, hỗ trợ lọc theo trạng thái xử lý và mức độ nghiêm trọng."
+      operationId: getAdminSafetyIncidents
+      tags:
+        - Admin - Safety & Emergency Management
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          required: false
+          description: "Số trang cần truy vấn (mặc định 1)."
+          schema:
+            type: integer
+            default: 1
+            example: 1
+        - name: limit
+          in: query
+          required: false
+          description: "Số lượng bản ghi trên một trang (mặc định 10)."
+          schema:
+            type: integer
+            default: 10
+            example: 10
+        - name: status
+          in: query
+          required: false
+          description: "Lọc theo trạng thái xử lý của cảnh báo SOS."
+          schema:
+            type: string
+            enum: [TRIGGERED, IN_PROGRESS, RESOLVED, FALSE_ALARM]
+            example: "TRIGGERED"
+        - name: severity
+          in: query
+          required: false
+          description: "Lọc theo mức độ nghiêm trọng."
+          schema:
+            type: string
+            enum: [CRITICAL, HIGH, MEDIUM]
+            example: "CRITICAL"
+      responses:
+        '200':
+          description: "Lấy danh sách sự cố an toàn thành công."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IncidentListSuccessResponse'
+        '401':
+          description: "Chưa xác thực token hoặc Token hết hạn."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: "Không có quyền Quản trị viên (Admin)."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: "Lỗi hệ thống nội bộ."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/admin/safety/incidents/{incidentId}:
+    get:
+      summary: FR61 - Xem chi tiết sự cố an toàn hoặc cảnh báo SOS
+      description: "API dành cho Quản trị viên (Admin) để xem thông tin chi tiết sự cố SOS, bao gồm tọa độ vị trí khẩn cấp, chuyến đi liên quan, thông tin liên hệ của khách hàng và tài xế."
+      operationId: getAdminSafetyIncidentDetail
+      tags:
+        - Admin - Safety & Emergency Management
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: incidentId
+          in: path
+          required: true
+          description: "Mã định danh duy nhất của sự cố SOS."
+          schema:
+            type: integer
+            format: int64
+            example: 9001
+      responses:
+        '200':
+          description: "Lấy chi tiết sự cố an toàn thành công."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IncidentDetailSuccessResponse'
+        '401':
+          description: "Chưa xác thực token hoặc Token hết hạn."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: "Không có quyền Quản trị viên (Admin)."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: "Không tìm thấy sự cố an toàn."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: "Lỗi hệ thống nội bộ."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/admin/safety/incidents/{incidentId}/resolve:
+    post:
+      summary: FR61 - Xử lý và cập nhật trạng thái sự cố SOS
+      description: "API dành cho Quản trị viên (Admin) để cập nhật trạng thái xử lý sự cố (đang điều phối cứu hộ, báo công an, xác nhận báo động giả hoặc đã giải quyết xong)."
+      operationId: resolveSafetyIncident
+      tags:
+        - Admin - Safety & Emergency Management
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: incidentId
+          in: path
+          required: true
+          description: "Mã định danh duy nhất của sự cố SOS."
+          schema:
+            type: integer
+            format: int64
+            example: 9001
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResolveIncidentRequest'
+      responses:
+        '200':
+          description: "Cập nhật xử lý sự cố an toàn thành công."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IncidentDetailSuccessResponse'
+        '400':
+          description: "Dữ liệu xử lý không hợp lệ hoặc sự cố đã đóng."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: "Chưa xác thực token hoặc Token hết hạn."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: "Không có quyền Quản trị viên (Admin)."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: "Không tìm thấy sự cố an toàn."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: "Lỗi hệ thống nội bộ."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    LocationCoordinates:
+      type: object
+      properties:
+        latitude:
+          type: number
+          format: double
+          example: 10.776889
+        longitude:
+          type: number
+          format: double
+          example: 106.700806
+        address:
+          type: string
+          example: "Đường Nguyễn Huệ, Phường Bến Nghé, Quận 1, TP. Hồ Chí Minh"
+
+    IncidentItem:
+      type: object
+      properties:
+        incidentId:
+          type: integer
+          format: int64
+          example: 9001
+        tripId:
+          type: integer
+          format: int64
+          example: 12050
+        triggeredBy:
+          type: string
+          enum: [CUSTOMER, DRIVER, SYSTEM_AUTOMATIC]
+          example: "CUSTOMER"
+        reporterName:
+          type: string
+          example: "Nguyen Van A"
+        severity:
+          type: string
+          enum: [CRITICAL, HIGH, MEDIUM]
+          example: "CRITICAL"
+        status:
+          type: string
+          enum: [TRIGGERED, IN_PROGRESS, RESOLVED, FALSE_ALARM]
+          example: "TRIGGERED"
+        triggeredAt:
+          type: string
+          format: date-time
+          example: "2026-09-16T13:20:00Z"
+
+    PaginationMeta:
+      type: object
+      properties:
+        currentPage:
+          type: integer
+          example: 1
+        totalPages:
+          type: integer
+          example: 2
+        pageSize:
+          type: integer
+          example: 10
+        totalItems:
+          type: integer
+          example: 12
+
+    IncidentListData:
+      type: object
+      properties:
+        incidents:
+          type: array
+          items:
+            $ref: '#/components/schemas/IncidentItem'
+        pagination:
+          $ref: '#/components/schemas/PaginationMeta'
+
+    IncidentListSuccessResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: "Lấy danh sách sự cố an toàn thành công."
+        data:
+          $ref: '#/components/schemas/IncidentListData'
+
+    ResolveIncidentRequest:
+      type: object
+      required:
+        - action
+        - resolutionNotes
+      properties:
+        action:
+          type: string
+          enum: [CONTACTED_POLICE, CONTACTED_EMERGENCY_SERVICES, DISPATCHED_SUPPORT_TEAM, MARK_FALSE_ALARM, RESOLVE_INCIDENT]
+          description: "Hành động xử lý của Admin."
+          example: "CONTACTED_POLICE"
+        status:
+          type: string
+          enum: [IN_PROGRESS, RESOLVED, FALSE_ALARM]
+          description: "Trạng thái mới của sự cố."
+          example: "IN_PROGRESS"
+        resolutionNotes:
+          type: string
+          description: "Ghi chú chi tiết về quá trình xử lý sự cố khẩn cấp."
+          example: "Đã liên hệ Công an Phường Bến Nghé tới vị trí hiện tại của chuyến đi để kiểm tra."
+
+    IncidentDetailData:
+      type: object
+      properties:
+        incidentId:
+          type: integer
+          format: int64
+          example: 9001
+        tripId:
+          type: integer
+          format: int64
+          example: 12050
+        triggeredBy:
+          type: string
+          enum: [CUSTOMER, DRIVER, SYSTEM_AUTOMATIC]
+          example: "CUSTOMER"
+        customerName:
+          type: string
+          example: "Nguyen Van A"
+        customerPhone:
+          type: string
+          example: "0901234567"
+        driverName:
+          type: string
+          example: "Tran Van B"
+        driverPhone:
+          type: string
+          example: "0987654321"
+        vehicleLicensePlate:
+          type: string
+          example: "51H-123.45"
+        lastKnownLocation:
+          $ref: '#/components/schemas/LocationCoordinates'
+        severity:
+          type: string
+          enum: [CRITICAL, HIGH, MEDIUM]
+          example: "CRITICAL"
+        status:
+          type: string
+          enum: [TRIGGERED, IN_PROGRESS, RESOLVED, FALSE_ALARM]
+          example: "IN_PROGRESS"
+        actionTake:
+          type: string
+          example: "CONTACTED_POLICE"
+        resolutionNotes:
+          type: string
+          example: "Đã liên hệ Công an Phường Bến Nghé tới vị trí hiện tại của chuyến đi để kiểm tra."
+        handledByAdminName:
+          type: string
+          example: "Admin Nguyễn Văn X"
+        triggeredAt:
+          type: string
+          format: date-time
+          example: "2026-09-16T13:20:00Z"
+        resolvedAt:
+          type: string
+          format: date-time
+          nullable: true
+          example: null
+
+    IncidentDetailSuccessResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: "Lấy chi tiết sự cố an toàn thành công."
+        data:
+          $ref: '#/components/schemas/IncidentDetailData'
+
+    ErrorResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        errorCode:
+          type: string
+          example: "INCIDENT_ALREADY_RESOLVED"
+        message:
+          type: string
+          example: "Sự cố an toàn này đã được đóng xử lý trước đó."
+        timestamp:
+          type: string
+          format: date-time
+          example: "2026-09-16T13:30:00Z"
