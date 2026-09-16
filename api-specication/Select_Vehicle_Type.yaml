@@ -1,0 +1,100 @@
+openapi: 3.0.3
+info:
+  title: CAB System API - FR08 Select Vehicle Type
+  version: 1.0.0
+paths:
+  /api/v1/bookings/vehicle-type:
+    post:
+      summary: FR08 - Lựa chọn loại xe của khách hàng
+      description: "API ghi nhận loại xe mà khách hàng chọn (ví dụ: BIKE, CAR_4_SEATS, CAR_7_SEATS) cho yêu cầu đặt xe."
+      operationId: selectVehicleType
+      tags:
+        - Booking
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - vehicleTypeCode
+              properties:
+                vehicleTypeCode:
+                  type: string
+                  enum: [BIKE, CAR_4_SEATS, CAR_7_SEATS]
+                  description: "Mã loại xe khách hàng lựa chọn."
+                  example: "CAR_4_SEATS"
+      responses:
+        '200':
+          description: "Đã tiếp nhận và lưu loại xe khách hàng lựa chọn thành công."
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Lựa chọn loại xe thành công."
+                  data:
+                    type: object
+                    properties:
+                      selectionId:
+                        type: integer
+                        format: int64
+                        example: 701
+                      vehicleTypeCode:
+                        type: string
+                        example: "CAR_4_SEATS"
+                      vehicleTypeName:
+                        type: string
+                        example: "Xe ô tô 4 chỗ"
+                      capacity:
+                        type: integer
+                        example: 4
+        '400':
+          description: "Mã loại xe không hợp lệ hoặc không được hỗ trợ."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: "Chưa xác thực token hoặc Token hết hạn."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: "Lỗi hệ thống nội bộ."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    ErrorResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        errorCode:
+          type: string
+          example: "INVALID_VEHICLE_TYPE"
+        message:
+          type: string
+          example: "Loại xe được chọn không tồn tại trong hệ thống."
+        timestamp:
+          type: string
+          format: date-time
+          example: "2026-09-16T12:55:00Z"
