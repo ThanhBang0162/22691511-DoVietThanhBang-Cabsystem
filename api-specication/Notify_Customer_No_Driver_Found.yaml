@@ -1,0 +1,123 @@
+openapi: 3.0.3
+info:
+  title: CAB System API - FR24 Notify Customer No Driver Found
+  version: 1.0.0
+paths:
+  /api/v1/matching/notify-no-driver:
+    post:
+      summary: FR24 - Thông báo cho khách hàng khi không tìm được tài xế
+      description: "API hệ thống kích hoạt gửi thông báo và cập nhật trạng thái yêu cầu đặt xe khi không có tài xế phù hợp tiếp nhận chuyến đi."
+      operationId: notifyNoDriverFound
+      tags:
+        - Driver Matching
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NotifyNoDriverRequest'
+      responses:
+        '200':
+          description: "Gửi thông báo không tìm thấy tài xế cho khách hàng thành công."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotifyNoDriverSuccessResponse'
+        '400':
+          description: "Yêu cầu không hợp lệ hoặc requestId không tồn tại."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: "Chưa xác thực token hoặc Token không có quyền thực hiện."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: "Lỗi hệ thống nội bộ."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    NotifyNoDriverRequest:
+      type: object
+      required:
+        - requestId
+        - reasonCode
+      properties:
+        requestId:
+          type: integer
+          format: int64
+          description: "Mã định danh duy nhất của yêu cầu đặt xe."
+          example: 5001
+        reasonCode:
+          type: string
+          enum: [NO_AVAILABLE_DRIVERS, ALL_DRIVERS_REJECTED, MATCHING_TIMEOUT]
+          description: "Lý do không tìm được tài xế."
+          example: "ALL_DRIVERS_REJECTED"
+        message:
+          type: string
+          description: "Nội dung thông báo tùy chỉnh gửi tới khách hàng (không bắt buộc)."
+          example: "Hiện tại các tài xế trong khu vực đều bận, vui lòng thử lại sau ít phút."
+
+    NotifyNoDriverData:
+      type: object
+      properties:
+        requestId:
+          type: integer
+          format: int64
+          example: 5001
+        customerId:
+          type: integer
+          format: int64
+          example: 1001
+        requestStatus:
+          type: string
+          enum: [NO_DRIVER_FOUND]
+          example: "NO_DRIVER_FOUND"
+        notifiedAt:
+          type: string
+          format: date-time
+          example: "2026-09-16T13:30:00Z"
+
+    NotifyNoDriverSuccessResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: "Đã cập nhật trạng thái yêu cầu và gửi thông báo cho khách hàng thành công."
+        data:
+          $ref: '#/components/schemas/NotifyNoDriverData'
+
+    ErrorResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        errorCode:
+          type: string
+          example: "REQUEST_NOT_FOUND"
+        message:
+          type: string
+          example: "Không tìm thấy yêu cầu đặt xe tương ứng trong hệ thống."
+        timestamp:
+          type: string
+          format: date-time
+          example: "2026-09-16T13:30:00Z"
