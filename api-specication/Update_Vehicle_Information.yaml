@@ -1,0 +1,155 @@
+openapi: 3.0.3
+info:
+  title: CAB System API - FR12 Update Vehicle Information
+  version: 1.0.0
+paths:
+  /api/v1/drivers/vehicles:
+    post:
+      summary: FR12 - Cập nhật thông tin phương tiện của tài xế
+      description: "API cho phép tài xế đăng ký mới hoặc cập nhật thông tin phương tiện (biển số xe, loại xe, hãng xe, mẫu xe) dùng để đón khách."
+      operationId: updateVehicleInfo
+      tags:
+        - Driver Vehicle
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateVehicleRequest'
+      responses:
+        '200':
+          description: "Cập nhật thông tin phương tiện thành công."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateVehicleSuccessResponse'
+        '400':
+          description: "Dữ liệu phương tiện không hợp lệ (biển số sai định dạng hoặc thiếu thông tin bắt buộc)."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: "Chưa xác thực token hoặc Token hết hạn."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: "Biển số xe đã được đăng ký bởi một tài xế khác trong hệ thống."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: "Lỗi hệ thống nội bộ."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    UpdateVehicleRequest:
+      type: object
+      required:
+        - vehicleType
+        - licensePlate
+      properties:
+        vehicleType:
+          type: string
+          enum: [BIKE, CAR_4_SEATS, CAR_7_SEATS]
+          description: "Mã loại xe đăng ký hoạt động."
+          example: "CAR_4_SEATS"
+        licensePlate:
+          type: string
+          maxLength: 15
+          description: "Biển số xe đăng ký."
+          example: "51H-123.45"
+        brand:
+          type: string
+          maxLength: 50
+          description: "Hãng sản xuất xe."
+          example: "Toyota"
+        model:
+          type: string
+          maxLength: 50
+          description: "Dòng/Mẫu xe."
+          example: "Vios"
+        color:
+          type: string
+          maxLength: 30
+          description: "Màu xe."
+          example: "Trắng"
+
+    VehicleData:
+      type: object
+      properties:
+        vehicleId:
+          type: integer
+          format: int64
+          example: 301
+        driverId:
+          type: integer
+          format: int64
+          example: 201
+        vehicleType:
+          type: string
+          example: "CAR_4_SEATS"
+        licensePlate:
+          type: string
+          example: "51H-123.45"
+        brand:
+          type: string
+          example: "Toyota"
+        model:
+          type: string
+          example: "Vios"
+        color:
+          type: string
+          example: "Trắng"
+        status:
+          type: string
+          enum: [ACTIVE, INACTIVE]
+          example: "ACTIVE"
+        updatedAt:
+          type: string
+          format: date-time
+          example: "2026-09-16T13:05:00Z"
+
+    UpdateVehicleSuccessResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: "Cập nhật thông tin phương tiện thành công."
+        data:
+          $ref: '#/components/schemas/VehicleData'
+
+    ErrorResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        errorCode:
+          type: string
+          example: "LICENSE_PLATE_ALREADY_EXISTS"
+        message:
+          type: string
+          example: "Biển số xe đã được đăng ký trên hệ thống."
+        timestamp:
+          type: string
+          format: date-time
+          example: "2026-09-16T13:05:00Z"
