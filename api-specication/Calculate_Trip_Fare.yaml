@@ -1,0 +1,176 @@
+openapi: 3.0.3
+info:
+  title: CAB System API - FR33 Calculate Trip Fare
+  version: 1.0.0
+paths:
+  /api/v1/pricing/calculate-fare:
+    post:
+      summary: FR33 - Tính toán cước phí chuyến đi
+      description: "API tính toán cước phí dự kiến cho chuyến đi dựa trên điểm đón, điểm trả, loại phương tiện và các phụ phí/hệ số giá tại thời điểm đặt xe."
+      operationId: calculateTripFare
+      tags:
+        - Pricing & Payment
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CalculateFareRequest'
+      responses:
+        '200':
+          description: "Tính toán cước phí chuyến đi thành công."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CalculateFareSuccessResponse'
+        '400':
+          description: "Tham số đầu vào không hợp lệ hoặc không xác định được tuyến đường."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: "Chưa xác thực token hoặc Token hết hạn."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: "Lỗi hệ thống nội bộ."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    CalculateFareRequest:
+      type: object
+      required:
+        - pickupLatitude
+        - pickupLongitude
+        - dropoffLatitude
+        - dropoffLongitude
+        - vehicleType
+      properties:
+        pickupLatitude:
+          type: number
+          format: double
+          minimum: -90
+          maximum: 90
+          description: "Vĩ độ điểm đón."
+          example: 10.7769
+        pickupLongitude:
+          type: number
+          format: double
+          minimum: -180
+          maximum: 180
+          description: "Kinh độ điểm đón."
+          example: 106.7009
+        dropoffLatitude:
+          type: number
+          format: double
+          minimum: -90
+          maximum: 90
+          description: "Vĩ độ điểm trả."
+          example: 10.8185
+        dropoffLongitude:
+          type: number
+          format: double
+          minimum: -180
+          maximum: 180
+          description: "Kinh độ điểm trả."
+          example: 106.6588
+        vehicleType:
+          type: string
+          enum: [BIKE, CAR_4_SEATS, CAR_7_SEATS]
+          description: "Loại phương tiện di chuyển."
+          example: "CAR_4_SEATS"
+        promoCode:
+          type: string
+          description: "Mã khuyến mãi áp dụng (nếu có)."
+          example: "WELCOME2026"
+
+    FareBreakdown:
+      type: object
+      properties:
+        baseFare:
+          type: number
+          format: double
+          description: "Cước phí mở cửa/giá cơ bản (VND)."
+          example: 15000
+        distanceFare:
+          type: number
+          format: double
+          description: "Cước phí tính theo quãng đường (VND)."
+          example: 100000
+        surgeMultiplier:
+          type: number
+          format: float
+          description: "Hệ số giá giờ cao điểm/nhu cầu cao."
+          example: 1.2
+        discountAmount:
+          type: number
+          format: double
+          description: "Số tiền được giảm giá từ mã khuyến mại (VND)."
+          example: 15000
+
+    CalculateFareData:
+      type: object
+      properties:
+        currency:
+          type: string
+          example: "VND"
+        estimatedDistanceInKm:
+          type: number
+          format: float
+          description: "Quãng đường dự kiến (km)."
+          example: 8.5
+        estimatedDurationInMinutes:
+          type: integer
+          description: "Thời gian di chuyển dự kiến (phút)."
+          example: 22
+        totalFare:
+          type: number
+          format: double
+          description: "Tổng cước phí cuối cùng sau khi áp dụng hệ số và giảm giá (VND)."
+          example: 123000
+        fareBreakdown:
+          $ref: '#/components/schemas/FareBreakdown'
+
+    CalculateFareSuccessResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: "Tính toán cước phí chuyến đi thành công."
+        data:
+          $ref: '#/components/schemas/CalculateFareData'
+
+    ErrorResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        errorCode:
+          type: string
+          example: "INVALID_PROMO_CODE"
+        message:
+          type: string
+          example: "Mã khuyến mãi không hợp lệ hoặc đã hết lượt sử dụng."
+        timestamp:
+          type: string
+          format: date-time
+          example: "2026-09-16T14:30:00Z"
