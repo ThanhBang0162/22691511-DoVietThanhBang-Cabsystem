@@ -1,0 +1,128 @@
+openapi: 3.0.3
+info:
+  title: CAB System API - FR20 Driver Accept Trip Assignment
+  version: 1.0.0
+paths:
+  /api/v1/driver-assignments/{assignmentId}/accept:
+    post:
+      summary: FR20 - Cho phép tài xế chấp nhận chuyến đi
+      description: "API cho phép tài xế gửi xác nhận chấp nhận chuyến đi được hệ thống đề xuất, bắt đầu quá trình di chuyển đón khách."
+      operationId: acceptTripAssignment
+      tags:
+        - Driver Matching
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: assignmentId
+          in: path
+          required: true
+          description: "Mã định danh duy nhất của lượt phân công chuyến đi."
+          schema:
+            type: integer
+            format: int64
+            example: 8001
+      responses:
+        '200':
+          description: "Chấp nhận chuyến đi thành công."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AcceptTripSuccessResponse'
+        '400':
+          description: "Yêu cầu không hợp lệ hoặc lượt phân công đã hết hạn/không còn khả dụng."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: "Chưa xác thực token hoặc Token hết hạn."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: "Tài xế đang thực hiện một chuyến đi khác hoặc chuyến này đã được nhận bởi người khác."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: "Lỗi hệ thống nội bộ."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    TripAssignmentAcceptData:
+      type: object
+      properties:
+        assignmentId:
+          type: integer
+          format: int64
+          example: 8001
+        tripId:
+          type: integer
+          format: int64
+          description: "Mã chuyến đi vừa được chính thức tạo lập."
+          example: 9001
+        driverId:
+          type: integer
+          format: int64
+          example: 201
+        responseStatus:
+          type: string
+          enum: [ACCEPTED]
+          example: "ACCEPTED"
+        pickupLocation:
+          type: string
+          example: "123 Nguyễn Huệ, Phường Bến Nghé, Quận 1, TP. Hồ Chí Minh"
+        destination:
+          type: string
+          example: "Sân bay Tân Sơn Nhất, Quận Tân Bình, TP. Hồ Chí Minh"
+        customerName:
+          type: string
+          example: "Nguyen Van A"
+        customerPhone:
+          type: string
+          example: "0901234567"
+        acceptedAt:
+          type: string
+          format: date-time
+          example: "2026-09-16T13:25:00Z"
+
+    AcceptTripSuccessResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: "Chấp nhận chuyến đi thành công."
+        data:
+          $ref: '#/components/schemas/TripAssignmentAcceptData'
+
+    ErrorResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        errorCode:
+          type: string
+          example: "ASSIGNMENT_EXPIRED"
+        message:
+          type: string
+          example: "Lượt đề xuất chuyến đi đã hết thời gian chờ phản hồi."
+        timestamp:
+          type: string
+          format: date-time
+          example: "2026-09-16T13:25:00Z"
